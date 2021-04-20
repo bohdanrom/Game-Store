@@ -1,0 +1,140 @@
+body{
+	margin: 0;
+	padding: 0;
+    font-family: "Arial", sans-serif;;
+}
+ul, li{
+    display: block;
+	margin: 0;
+	padding: 0;
+}
+h1, h2, h3, h4, h5, h6{
+	text-decoration: none;
+    margin: 0;
+    padding: 0;
+}
+div, p, form, input, a, span, button{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+a, a:hover, a:active{
+    text-decoration: none;
+    outline: none;
+    color: #ffffff;
+}
+a, button, input{
+    transition: all 0.5s ease;
+}
+input, input:hover, input:focus, input:active,
+button, button:hover, button:focus, button:active{
+    outline: none;
+}
+header, footer{
+    background: #000000;
+    margin: 0;
+    padding: 0;
+}
+.main{
+    background: #1e1e1e;
+    padding-top: 60px;
+    box-sizing: border-box;
+}
+.nav-link{
+    font-size: 22px;
+}
+.nav-item{
+    margin-left: 20px;
+}
+.logo{
+    width: auto;
+    height: 10px;
+    float:left;
+    margin: 0;
+    padding: 0;
+}
+.navbar-nav{
+    margin-left: 40px;
+}
+.logo-and-text{
+    display: flex;
+    justify-content: space-around;
+}
+.logo-text{
+    font-weight: bold;
+    font-size: 30px;
+    color: #ffffff;
+    margin: 27px auto;
+}
+.game_photo{
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    border-radius: 10px;
+}
+.name_price_buy-button{
+    display: flex;
+    margin-top: 50px;
+    width: 95%;
+    justify-content: space-between;
+}
+.button{
+    margin-top: 50px;
+    text-align: right;
+}
+.name_and_price{
+    margin-left: 55px;
+}
+.game_name{
+    font-weight: bold;
+    font-size: 50px;
+    color: #ffffff;
+}
+.price{
+    font-size: 30px;
+    color: #ffffff;
+}
+.buy_button{
+    color: rgba(255,255,255,0.85);
+    background: #169c3f;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 10px 10px 10px;
+    width: 180px;
+    height: 50px;
+    text-align: center;
+    display: inline-block;
+    font-size: 25px;
+    font-weight: bold;
+}
+.game_description{
+    font-size: 18px;
+    margin: 25px 0 0 55px;
+}
+.game_description_text{
+    width: 95%;
+    color: #ffffff;
+}
+.game_genres{
+    display: flex;
+    margin-left: 45px;
+    margin-top: 15px;
+}
+.genre{
+    color: rgba(255,255,255,0.85);
+    font-size: 18px;
+    font-weight: bold;
+    background: #5097f3;
+    border-radius: 20px;
+    padding: 4px 15px;
+    margin-left: 10px;
+    text-align: center;
+    display: inline-block;
+}
+.game_platforms{
+    margin-left: 50px;
+    margin-top: 15px;
+}

@@ -1,0 +1,23 @@
+{% extends "index.html" %}
+{% block title %}All Games{% endblock %}
+{% block content %}
+<div class="row">
+        <div class="overflow-auto">
+                {% for data, genres, photos in all_games|zip(game_genres,game_photos) %}
+                        <div class="card" style="width: 18rem;">
+                                <img class="card-img-top" src="data:image/jpeg;base64,{{ photos }}" alt="Card image cap">
+                                        <div class="card-body">
+                                                <h5 class="card-title">{{ data.game_name }}</h5>
+                                                <p class="card-text">{{ genres.game_type_name }}</p>
+                                                <a href="#" class="btn btn-primary">{{ data.price }}</a>
+                                        </div>
+                        </div>
+{#                        <div class="game_photo_div">#}
+{#                                <img src="data:image/jpeg;base64,{{ photos }}" height="400" alt="my_img" class="platform_ico">#}
+{#                                <p style="color: #ffffff" class="game-data">{{ data.game_name, data.price }}</p>#}
+{#                                <p style="color: #ffffff" class="game-data">{{ genres.game_name, genres.game_type_name }}</p>#}
+{#                        </div>#}
+                {% endfor %}
+        </div>
+</div>
+{% endblock %}

@@ -2,21 +2,35 @@
 {% block title %}All Games{% endblock %}
 {% block content %}
 <div class="row">
-        <div class="overflow-auto">
-                {% for data, genres, photos in all_games|zip(game_genres,game_photos) %}
-                        <div class="card" style="width: 18rem;">
-                                <img class="card-img-top" src="data:image/jpeg;base64,{{ photos }}" alt="Card image cap">
-                                        <div class="card-body">
-                                                <h5 class="card-title">{{ data.game_name }}</h5>
-                                                <p class="card-text">{{ genres.game_type_name }}</p>
-                                                <a href="#" class="btn btn-primary">{{ data.price }}</a>
+        <div class="all_games">
+                {% for data, photo in all_games|zip(game_images) %}
+                        <div class="game_photo_div">
+                                <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref">
+                                        <img src="data:image/jpeg;base64,{{ photo }}" height="170" alt="game_img" class="game_ico">
+                                </a>
+                                <div class="game_information">
+                                        <div class="price_and_button">
+                                                <p class="game-price">{{ data.price }}$</p>
+                                                <div class="buttons">
+                                                        <a href="#" class="buy-button">BUY</a>
+                                                </div>
                                         </div>
+                                        <div class="game_genres_and_name">
+                                                <div class="game_genres_for_one">
+                                                        {% for genre in data.genres %}
+                                                                <p class="game-genre">
+                                                                        {% if data.genres|length > 1 %}
+                                                                                {{ genre.game_type_name }} / <!--ТРЕБА ПРИДУМАТИ ЯК ЗАБРАТИ СЛЕШ ВКІНЦІ-->
+                                                                        {% else %}
+                                                                                {{ genre.game_type_name }}
+                                                                        {% endif %}
+                                                                </p>
+                                                        {% endfor %}
+                                                </div>
+                                                <h4 class="game-name">{{ data.game_name }}</h4>
+                                        </div>
+                                </div>
                         </div>
-{#                        <div class="game_photo_div">#}
-{#                                <img src="data:image/jpeg;base64,{{ photos }}" height="400" alt="my_img" class="platform_ico">#}
-{#                                <p style="color: #ffffff" class="game-data">{{ data.game_name, data.price }}</p>#}
-{#                                <p style="color: #ffffff" class="game-data">{{ genres.game_name, genres.game_type_name }}</p>#}
-{#                        </div>#}
                 {% endfor %}
         </div>
 </div>

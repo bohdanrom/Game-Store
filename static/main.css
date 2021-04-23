@@ -43,9 +43,6 @@ header, footer{
 .nav-link{
     font-size: 22px;
 }
-.nav-item{
-    margin-left: 20px;
-}
 .logo{
     width: auto;
     height: 10px;
@@ -54,39 +51,48 @@ header, footer{
     padding: 0;
 }
 .navbar-nav{
-    margin-left: 40px;
+    margin-left: 10px;
+}
+.nav-item{
+    margin-right: 20px;
+}
+.user_photo{
+    margin-right: 10px;
+}
+.user_name{
+    color: #ffffff;
 }
 .logo-and-text{
     display: flex;
     justify-content: space-around;
+    margin-right: 20px;
 }
 .logo-text{
     font-weight: bold;
     font-size: 30px;
     color: #ffffff;
-    margin: 27px auto;
+    margin: 22px 0 28px 0;
 }
 .game_photo{
     max-width: 100%;
     height: auto;
-    display: block;
+    width: 90%;
     margin-left: auto;
     margin-right: auto;
-    width: 90%;
+    display: block;
     border-radius: 10px;
 }
 .name_price_buy-button{
     display: flex;
-    margin-top: 50px;
-    width: 95%;
     justify-content: space-between;
+    margin-top: 50px;
+    width: 90%;
+    margin-right: auto;
+    margin-left: auto;
 }
 .button{
     margin-top: 50px;
     text-align: right;
-}
-.name_and_price{
-    margin-left: 55px;
 }
 .game_name{
     font-weight: bold;
@@ -115,26 +121,109 @@ header, footer{
     margin: 25px 0 0 55px;
 }
 .game_description_text{
-    width: 95%;
     color: #ffffff;
+}
+.about_game{
+    margin: 0 auto;
 }
 .game_genres{
     display: flex;
-    margin-left: 45px;
     margin-top: 15px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
 }
 .genre{
+    margin-right: 10px;
+}
+.genre_text{
     color: rgba(255,255,255,0.85);
     font-size: 18px;
     font-weight: bold;
     background: #5097f3;
     border-radius: 20px;
     padding: 4px 15px;
-    margin-left: 10px;
     text-align: center;
     display: inline-block;
 }
 .game_platforms{
     margin-left: 50px;
     margin-top: 15px;
+}
+.game-genre{
+    margin-right: 5px;
+    font-size: 15px;
+}
+.all_games{
+    margin-left: auto;
+    margin-right: auto;
+    width: 92%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: right;
+    height: 699px;
+    overflow-y:auto;
+}
+::-webkit-scrollbar{
+    width: 5px;
+}
+::-webkit-scrollbar-track{
+    box-shadow: #1e1e1e;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb{
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+    height: 600px;
+}
+::-webkit-scrollbar-thumb:hover{
+    transition-property: background;
+    transition-duration: 4s;
+    transition-delay: 3s;
+    background: rgba(255,255,255,0.85);
+}
+.game_photo_div{
+    color: #ffffff;
+    width: 30%;
+    margin-right: 20px;
+    margin-bottom: 30px;
+}
+.buy-button{
+    color: rgba(255,255,255,0.85);
+    background: #169c3f;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 5px;
+    width: 70px;
+    height: 30px;
+    text-align: center;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: bold;
+}
+.game_ico{
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+.game-price{
+    font-size: 20px;
+}
+.game_genres_and_name{
+    display: block;
+}
+.game_genres_for_one{
+    display: flex;
+}
+.price_and_button{
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+.game-name{
+    font-size: 20px;
+    font-weight: bold;
 }

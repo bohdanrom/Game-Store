@@ -2,23 +2,38 @@
 {% block title %}All Games{% endblock %}
 {% block content %}
 <div class="row">
-        <div class="all_games">
+        <div class="filer_and_search">
+                <div class="filter">
+                        <p style="color: #ffffff">Here will be filter</p>
+                </div>
+                <div class="search_div">
+                        <div class="add_game_button">
+                                <a href="/add-game" class="add_game">Add game</a>
+                        </div>
+                        <form action="{{ url_for('search') }}" class="search" id="search" method="post">
+                                <input type="text" class="search_game" name="search" id="live_search" placeholder="Enter game name">
+                        </form>
+                </div>
+        </div>
+</div>
+<div class="row">
+        <div class="all_games" id="all_games">
                 {% for data, photo in all_games|zip(game_images) %}
-                        <div class="game_photo_div">
-                                <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref">
-                                        <img src="data:image/jpeg;base64,{{ photo }}" height="170" alt="game_img" class="game_ico">
+                        <div class="game_photo_div" game_id="{{ data.game_id }}">
+                                <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
+                                        <img src="data:image/jpeg;base64,{{ photo }}" height="170" alt="game_img" class="game_ico" id="game_ico">
                                 </a>
-                                <div class="game_information">
-                                        <div class="price_and_button">
-                                                <p class="game-price">{{ data.price }}$</p>
-                                                <div class="buttons">
-                                                        <a href="#" class="buy-button">BUY</a>
+                                <div class="game_information" id="game_information">
+                                        <div class="price_and_button" id="price_and_button">
+                                                <p class="game-price" id="game-price">{{ data.price }}$</p>
+                                                <div class="buttons" id="buttons">
+                                                        <a href="#" class="buy-button" id="buy-button">BUY</a>
                                                 </div>
                                         </div>
-                                        <div class="game_genres_and_name">
-                                                <div class="game_genres_for_one">
+                                        <div class="game_genres_and_name" id="game_genres_and_name">
+                                                <div class="game_genres_for_one" id="game_genres_for_one">
                                                         {% for genre in data.genres %}
-                                                                <p class="game-genre">
+                                                                <p class="game-genre" id="game-genre">
                                                                         {% if data.genres|length > 1 %}
                                                                                 {{ genre.game_type_name }} / <!--ТРЕБА ПРИДУМАТИ ЯК ЗАБРАТИ СЛЕШ ВКІНЦІ-->
                                                                         {% else %}
@@ -27,11 +42,42 @@
                                                                 </p>
                                                         {% endfor %}
                                                 </div>
-                                                <h4 class="game-name">{{ data.game_name }}</h4>
+                                                <h4 class="game-name" id="game-name">{{ data.game_name }}</h4>
                                         </div>
                                 </div>
                         </div>
                 {% endfor %}
         </div>
 </div>
+<script>
+        $(document).ready(function () {
+            $('#live_search').on('keyup', function () {
+                let search = $(this).val();
+                if ((search != '') && (search.length > 3)) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/search',
+                        data: {'game_name': search},
+                        success: function (msg) {
+                            let indexArray = []
+                            if (msg != '') {
+                                for (let i = 0; i < msg.length; i++) {
+                                    indexArray.push(msg[i].game_id)
+                                }
+                                let divs = document.getElementsByClassName('game_photo_div');
+                                for (let i = 0; i < divs.length; i++) {
+                                    if (indexArray.includes(Number(divs[i].getAttribute('game_id')))) {
+                                        console.log(divs[i])
+                                    }
+                                    else {
+                                        divs[i].style.display = 'none';
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+</script>
 {% endblock %}

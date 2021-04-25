@@ -11,12 +11,11 @@
         <meta name="author" content="Bohdan_Romanytsia">
         <link rel="icon" type="image/png" href="static/ri2759.ico">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='slick.css') }}"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='slick-theme.css') }}"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" crossorigin="anonymous"></script>
         <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -25,7 +24,7 @@
 			            <div class="row">
 				                <nav class="navbar navbar-expand-sm navbar-dark">
 					                    <div class="logo-and-text">
-						                        <a class="navbar-brand" href="{{ url_for('main_page') }}">
+						                        <a class="navbar-brand" href="{{ url_for('display_all_games') }}">
 								                        <img src="static/ri2759.ico" height="80" class="d-inline-block align-top" alt="Game-store-logo">
 						                        </a>
 						                        <p class="logo-text">Game store</p>
@@ -45,10 +44,11 @@
                                                 </li>
 			                        	</ul>
 				                        <div class="navbar-nav">
-					                            <a href="#" class="nav-item nav-link user_photo"><img height="60" src="static/pngegg.png" alt=""></a>
+					                            <a href="#" class="nav-item nav-link user_photo"><img height="60" width="60" class="user_ico" {% block user_icos %} {% if customer %} src="data:image/jpeg;base64,{{ customer.customer_photo }}" {% else %} src="static/pngegg.png" {% endif %} {% endblock %} alt="user_photo"></a>
 				                        </div>
                                         <div class="navbar-nav">
-					                            <p class="user_name">John Snow</p>
+					                            <p class="user_first_name">{% if customer %} {{ customer.customer_first_name }} {% else %} {% endif %}</p>
+					                            <p class="user_last_name">{% if customer %} {{ customer.customer_last_name }} {% else %} {% endif %}</p>
 				                        </div>
                                         <div class="navbar-nav">
                                                 <a href="#" class="nav-item nav-link"><img height="20" src="static/pngaaa.com-3531796.png" alt=""></a>
@@ -71,7 +71,7 @@
 			            <div class="row">
 				                <nav class="navbar navbar-expand-sm navbar-dark">
 					                    <div class="logo-and-text">
-						                        <a href="{{ url_for('main_page') }}" class="navbar-brand">
+						                        <a href="{{ url_for('display_all_games') }}" class="navbar-brand">
 						        	                    <img src="static/ri2759.ico" height="80" class="d-inline-block align-top" alt="Game-store-logo">
 						                        </a>
 						                        <p class="logo-text">Game store</p>
@@ -80,11 +80,5 @@
 			            </div>
 		        </div>
 	    </footer>
-        <script src="static/jquery-3.5.1.min.js"></script>
-        <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <script src="{{ url_for('static', filename='slick.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>

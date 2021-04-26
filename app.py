@@ -1,6 +1,6 @@
 import base64
 import jinja2
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect
 import models.db
 
 app = Flask(__name__)
@@ -9,7 +9,27 @@ env = jinja2.Environment()
 
 @app.route('/add-game', methods=["GET", "POST"])
 def add_new_game():
-    return render_template('add_game.html')
+    genres = models.db.GameGenres.query.all()
+    if request.method == 'POST':
+        game_name = request.form.get('new_game_name')
+        game_price = request.form.get('new_game_price')
+        game_genre = request.form.getlist('new_game_genre')
+        game_description = request.form.get('new_game_description')
+        game_image = request.files['new_game_ico'].read()
+        new_game = models.db.Games(game_name=game_name,
+                                   game_description=game_description,
+                                   price=float(game_price))
+        for genre in models.db.GameGenres.query.all():
+            if genre.game_type_name in game_genre:
+                new_game.genres.append(genre)
+        models.db.db.session.add(new_game)
+        models.db.db.session.commit()
+        new_game_image = models.db.GameImages(game_id=new_game.game_id,
+                                              game_photo=game_image)
+        models.db.db.session.add(new_game_image)
+        models.db.db.session.commit()
+        return render_template('add_game.html')
+    return render_template('add_game.html', genres=genres)
 
 
 @app.route('/<int:game_id>', methods=["GET", "POST"])
@@ -32,24 +52,46 @@ def display_game(game_id: int):
                            )
 
 
+@app.route('/<int:game_id>/edit', methods=["GET", "POST"])
+def edit_game(game_id: int):
+    game = models.db.Games.query.get(game_id)
+    genres = models.db.GameGenres.query.all()
+    game_image = models.db.GameImages.query.filter_by(game_id=game_id).first()
+    print(game_image)
+    if request.method == "POST":
+        game.game_name = request.form.get('new_game_name')
+        game.price = float(request.form.get('new_game_price'))
+        game_genres = request.form.getlist('new_game_genre')
+        game.game_description = request.form.get('new_game_description')
+        game_image.game_photo = request.files['new_game_ico'].read()
+        if game_genres:
+            game.genres.clear()
+            for genre in models.db.GameGenres.query.all():
+                if genre.game_type_name in game_genres:
+                    game.genres.append(genre)
+        models.db.db.session.commit()
+        return redirect("/")
+    return render_template('add_game.html', game=game, game_image=game_image, genres=genres)
+
+
 @app.route('/')
 def display_all_games():
     all_games = models.db.Games.query.order_by(models.db.Games.game_id).all()
+    genres = models.db.GameGenres.query.all()
     raw_game_images = models.db.GameImages.query.order_by(models.db.GameImages.game_id).all()
     game_images = [base64.b64encode(elem.game_photo).decode("utf-8") for elem in raw_game_images]
-    return render_template('all_games.html', all_games=all_games, game_images=game_images)
+    return render_template('all_games.html', all_games=all_games, game_images=game_images, genres=genres)
 
 
 @app.route('/search', methods=["POST"])
 def search():
     game_name = request.form['game_name']
-    search = f"%{str(game_name).capitalize()}%"
+    search = f"%{game_name}%"
     raw_all_games = models.db.Games.query.filter(models.db.Games.game_name.like(search)).all()
     game_ids, all_games = [], []
     for game in raw_all_games:
         game_ids.append(game.game_id)
         all_games.append(game.as_dict())
-    print(all_games)
     raw_game_images = models.db.GameImages.query.order_by(models.db.GameImages.game_id in game_ids).all()
     for index, element in enumerate(all_games):
         element['game_image'] = base64.b64encode(raw_game_images[index].game_photo).decode("utf-8")

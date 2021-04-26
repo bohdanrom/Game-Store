@@ -275,14 +275,163 @@ header, footer{
 }
 .new_game{
     display: flex;
-    margin: 0 auto;
+    flex-direction: column;
+    margin: 100px auto;
     width: 90%;
     justify-content: space-between;
 }
 .game_fields{
+    display: block;
+    margin: 0 auto;
     text-align: center;
 }
-.game_fields > input{
+.new_game_detail{
+    color: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 3px;
+    padding-left: 2px;
+    width: 400px;
+    height: 50px;
+    margin-bottom: 50px;
+    color: #000000;
     display: block;
-    margin-bottom: 10px;
+}
+.select_and_textarea{
+    display: block;
+}
+#new_game_description{
+    height: 150px;
+    outline: none;
+    resize: none;
+    margin-bottom: 20px;
+}
+.new_game_add_button{
+    background: #20c579;
+    font-size: 1.125rem;
+    color: #ffffff;
+    font-weight: bold;
+    outline: none;
+    width: 100px;
+    height: 60px;
+    line-height: 1;
+    border:0 none;
+    border-radius: 0 3px 3px 0;
+}
+.input__wrapper {
+    width: 100%;
+    position: relative;
+    margin: 15px 0;
+    text-align: center;
+}
+.input__file {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+}
+.input__file-icon-wrapper {
+    height: 60px;
+    width: 60px;
+    margin-right: 15px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+    -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+    border-right: 1px solid #fff;
+}
+.input__file-button-text {
+    line-height: 1;
+    margin-top: 1px;
+}
+.input__file-button {
+    width: 100%;
+    height: 60px;
+    background: #02a0c5;
+    color: #ffffff;
+    font-size: 1.125rem;
+    font-weight: 700;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+    -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+    -moz-border-radius-bottomleft: 3px;
+    -moz-border-radius-bottomright: 3px;
+    cursor: pointer;
+    margin: 0;
+    border-radius: 3px 0 0 3px;
+}
+.image_and_button{
+    display: flex;
+}
+.submit_button{
+    margin: 15px 0 15px 5px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+}
+.dropdown-check-list, .filter-dropdown-check-list{
+    width: 400px;
+    display: inline-block;
+    margin-bottom: 51px;
+}
+.dropdown-check-list .anchor, .filter-dropdown-check-list .anchor{
+    text-align: start;
+    color: #808080;
+    background: #ffffff;
+    width: 400px;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    padding: 5px 50px 5px 2px;
+    border: none;
+    border-radius: 3px;
+}
+.dropdown-check-list .anchor:after, .filter-dropdown-check-list .anchor:after{
+    position: absolute;
+    content: "";
+    border-left: 2px solid black;
+    border-top: 2px solid black;
+    padding: 5px;
+    right: 10px;
+    top: 20%;
+    -moz-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    -o-transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    transform: rotate(-135deg);
+}
+.dropdown-check-list .anchor:active:after, .filter-dropdown-check-list .anchor:active:after{
+    right: 8px;
+    top: 21%;
+}
+.dropdown-check-list ul.items, .filter-dropdown-check-list ul.items{
+    padding: 2px;
+    display: none;
+    margin: 0;
+    border: 1px solid #000000;
+    border-top: none;
+}
+.dropdown-check-list ul.items li, .filter-dropdown-check-list ul.items li{
+    color: #000000;
+    list-style: none;
+    background: #ffffff;
+}
+.dropdown-check-list.visible .anchor, .filter-dropdown-check-list.visible .anchor {
+    color: #000000;
+}
+.dropdown-check-list.visible .items, .filter-dropdown-check-list.visible .items {
+    position: absolute;
+    z-index: 99;
+    display: block;
+    text-align: start;
+    width: 400px;
 }

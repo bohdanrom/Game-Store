@@ -3,15 +3,20 @@
 {% block content %}
 <div class="row">
         <div class="filer_and_search">
-                <div class="filter">
-                        <p style="color: #ffffff">Here will be filter</p>
+                <div id="filter" class="filter-dropdown-check-list" tabindex="100">
+                        <span class="anchor">Select Game Genres</span>
+                                <ul class="items">
+                                        {% for genre in genres %}
+                                                 <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{{genre.game_type_name}}</li>
+                                        {% endfor %}
+                                </ul>
                 </div>
                 <div class="search_div">
                         <div class="add_game_button">
                                 <a href="/add-game" class="add_game">Add game</a>
                         </div>
                         <form action="{{ url_for('search') }}" class="search" id="search" method="post">
-                                <input type="text" class="search_game" name="search" id="live_search" placeholder="Enter game name">
+                                <input type="search" class="search_game" name="search" id="live_search" placeholder="Enter game name">
                         </form>
                 </div>
         </div>
@@ -53,7 +58,7 @@
         $(document).ready(function () {
             $('#live_search').on('keyup', function () {
                 let search = $(this).val();
-                if ((search != '') && (search.length > 3)) {
+                if (search.length > 3) {
                     $.ajax({
                         type: 'POST',
                         url: '/search',
@@ -67,7 +72,7 @@
                                 let divs = document.getElementsByClassName('game_photo_div');
                                 for (let i = 0; i < divs.length; i++) {
                                     if (indexArray.includes(Number(divs[i].getAttribute('game_id')))) {
-                                        console.log(divs[i])
+                                        //pass
                                     }
                                     else {
                                         divs[i].style.display = 'none';
@@ -79,5 +84,14 @@
                 }
             });
         });
+</script>
+<script>
+        let checkList = document.getElementById('filter');
+                checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
+                        if (checkList.classList.contains('visible'))
+                                checkList.classList.remove('visible');
+                        else
+                                checkList.classList.add('visible');
+        }
 </script>
 {% endblock %}

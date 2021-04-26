@@ -29,9 +29,9 @@ class Games(db.Model, Mixin):
     game_id = db.Column(db.Integer, primary_key=True)
     game_name = db.Column(db.String(255), nullable=False, unique=True)
     game_description = db.Column(db.Text, nullable=False)
-    release_date = db.Column(db.Date, nullable=False)
+    release_date = db.Column(db.Date, nullable=False, default=date.today())
     number_of_players = db.Column(db.Integer, default=0)
-    quantity_available = db.Column(db.Integer)
+    quantity_available = db.Column(db.Integer, default=2000)
     price = db.Column(db.Numeric(5, 2))
     genres = db.relationship("GameGenres", secondary=games_and_game_genres,
                              lazy='subquery', backref=db.backref('classes', lazy=True))

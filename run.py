@@ -3,13 +3,14 @@ import jinja2
 from flask import Flask, render_template, request, jsonify, redirect
 import models.db
 
-app = Flask(__name__)
-env = jinja2.Environment()
+
+def return_genres():
+    genres = models.db.GameGenres.query.all()
+    return genres
 
 
 @app.route('/add-game', methods=["GET", "POST"])
 def add_new_game():
-    genres = models.db.GameGenres.query.all()
     if request.method == 'POST':
         game_name = request.form.get('new_game_name')
         game_price = request.form.get('new_game_price')
@@ -29,7 +30,7 @@ def add_new_game():
         models.db.db.session.add(new_game_image)
         models.db.db.session.commit()
         return render_template('add_game.html')
-    return render_template('add_game.html', genres=genres)
+    return render_template('add_game.html', genres=return_genres())
 
 
 @app.route('/<int:game_id>', methods=["GET", "POST"])
@@ -55,9 +56,7 @@ def display_game(game_id: int):
 @app.route('/<int:game_id>/edit', methods=["GET", "POST"])
 def edit_game(game_id: int):
     game = models.db.Games.query.get(game_id)
-    genres = models.db.GameGenres.query.all()
     game_image = models.db.GameImages.query.filter_by(game_id=game_id).first()
-    print(game_image)
     if request.method == "POST":
         game.game_name = request.form.get('new_game_name')
         game.price = float(request.form.get('new_game_price'))
@@ -71,16 +70,15 @@ def edit_game(game_id: int):
                     game.genres.append(genre)
         models.db.db.session.commit()
         return redirect("/")
-    return render_template('add_game.html', game=game, game_image=game_image, genres=genres)
+    return render_template('add_game.html', game=game, game_image=game_image, genres=return_genres())
 
 
 @app.route('/')
 def display_all_games():
     all_games = models.db.Games.query.order_by(models.db.Games.game_id).all()
-    genres = models.db.GameGenres.query.all()
     raw_game_images = models.db.GameImages.query.order_by(models.db.GameImages.game_id).all()
     game_images = [base64.b64encode(elem.game_photo).decode("utf-8") for elem in raw_game_images]
-    return render_template('all_games.html', all_games=all_games, game_images=game_images, genres=genres)
+    return render_template('all_games.html', all_games=all_games, game_images=game_images, genres=return_genres())
 
 
 @app.route('/search', methods=["POST"])
@@ -101,11 +99,4 @@ def search():
 
 
 if __name__ == '__main__':
-    app.jinja_env.filters['zip'] = zip
-    app.config['SECRET_KEY'] = 'random-secret-key'
-    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:BOGDAN12312r@localhost:5432/game_store2"
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    models.db.db.init_app(app)
-    models.db.ma = app
-    models.db.db.create_all(app=app)
     app.run(debug=True, use_reloader=True)

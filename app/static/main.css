@@ -435,3 +435,68 @@ header, footer{
     text-align: start;
     width: 400px;
 }
+/*_____________________________________*/
+#modal{
+    width: 350px;
+    height: 430px;
+    margin: auto auto;
+    background: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 15px;
+    z-index: 100;
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+}
+.reg_form{
+    width: 275px;
+    margin: -15px auto 20px auto;
+    text-align: center;
+}
+.input{
+    width: 260px;
+    padding: 5px;
+    margin-bottom: 15px;
+    border: none;
+    border-bottom: 2px solid #000000;
+}
+.close{
+    margin: 10px 10px 0 300px;
+    cursor: pointer;
+    border: 1px solid #000000;
+    padding: 2px;
+}
+#gray{
+    background: rgba(1,1,1,0.75);
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: none;
+    z-index: 150;
+    overflow: auto;
+}
+.register{
+    margin-top: 20px;
+}
+.submit{
+    background: #20c579;
+    border: none;
+}
+.login_ref{
+    color: #000000;
+}
+.login_ref:hover{
+    color: #169c3f;
+}
+.reg_form{
+    display: block;
+}
+.reg_form_new{
+    display: none;
+}

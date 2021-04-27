@@ -1,8 +1,5 @@
 from datetime import date
-from flask_sqlalchemy import SQLAlchemy
-
-
-db = SQLAlchemy()
+from . import db
 
 
 games_and_game_genres = db.Table(
@@ -36,7 +33,7 @@ class Games(db.Model, Mixin):
     genres = db.relationship("GameGenres", secondary=games_and_game_genres,
                              lazy='subquery', backref=db.backref('classes', lazy=True))
     platforms = db.relationship("Platforms", secondary=games_and_platforms,
-                             lazy='subquery', backref=db.backref('classes', lazy=True))
+                                lazy='subquery', backref=db.backref('classes', lazy=True))
 
 
 

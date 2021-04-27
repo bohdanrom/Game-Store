@@ -1,0 +1,50 @@
+{% extends "index.html" %}
+{% block title %}
+        {% if game %}
+                Edit Game
+        {% else %}
+                Add Game
+        {% endif %}
+{% endblock %}
+{% block content %}
+        <div class="row">
+                <div class="new_game">
+                        <form {% if game %} action="{{ url_for('edit_game', game_id=game.game_id)}}" {% else %} action="{{ url_for('add_new_game') }}" {% endif %} class="game_fields" method="post" enctype="multipart/form-data">
+                                <input type="text" class="new_game_detail" id="new_game_name" name="new_game_name" placeholder="Enter game name" {% if game %} value="{{ game.game_name }}" {% endif %} required>
+                                <input type="text" class="new_game_detail" id="new_game_price" name="new_game_price" placeholder="Enter game price" {% if game %} value="{{ game.price }}" {% endif %}>
+                                <div id="genres" class="dropdown-check-list" tabindex="100">
+                                        <span class="anchor">Select Game Genres</span>
+                                                <ul class="items">
+                                                        {% for genre in genres %}
+                                                                 <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{{genre.game_type_name}}</li>
+                                                        {% endfor %}
+                                                </ul>
+                                </div>
+                                <div class="select_and_textarea">
+                                        <textarea class="new_game_detail" id="new_game_description" name="new_game_description" placeholder="Enter game description" required>{% if game %} {{ game.game_description }} {% endif %}</textarea>
+                                </div>
+                                <div class="image_and_button">
+                                        <div class="input__wrapper">
+                                                <input type="file" name="new_game_ico" id="input__file" class="input input__file" {% if game_image %} value="{{ game_image.game_image }}" {% endif %}multiple>
+                                                        <label for="input__file" class="input__file-button">
+                                                                <span class="input__file-icon-wrapper"><img class="input__file-icon" src="./static/kisspng_computer_icons_logo_download_incoming_5b2fe3dddadc97_07.png" alt="Choose game image" width="30"></span>
+                                                                <span class="input__file-button-text">Choose game image</span>
+                                                        </label>
+                                        </div>
+                                        <div class="submit_button">
+                                                <input type="submit" class="new_game_add_button" value="Add game">
+                                        </div>
+                                </div>
+                        </form>
+                </div>
+        </div>
+<script>
+        let checkList = document.getElementById('genres');
+                checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
+                if (checkList.classList.contains('visible'))
+                        checkList.classList.remove('visible');
+                else
+                    checkList.classList.add('visible');
+        }
+</script>
+{% endblock %}

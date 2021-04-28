@@ -1,5 +1,8 @@
 from datetime import date
-from . import db
+
+from flask_login import UserMixin
+
+from . import db, manager
 
 
 games_and_game_genres = db.Table(
@@ -36,7 +39,6 @@ class Games(db.Model, Mixin):
                                 lazy='subquery', backref=db.backref('classes', lazy=True))
 
 
-
 class GameImages(db.Model, Mixin):
     __tablename__ = 'game_images'
     game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'))
@@ -58,9 +60,29 @@ class GameGenres(db.Model, Mixin):
     game_type_name = db.Column(db.String(255), nullable=False)
 
 
-class Customers(db.Model, Mixin):
+class Customers(db.Model, UserMixin):
     __tablename__ = 'customers'
     customer_id = db.Column(db.Integer, primary_key=True)
+    customer_email = db.Column(db.String(255), unique=True, nullable=False)
+    customer_password = db.Column(db.String(255), nullable=False)
     customer_photo = db.Column(db.LargeBinary)
     customer_first_name = db.Column(db.String(255))
     customer_last_name = db.Column(db.String(255))
+    manager_permission = db.Column(db.Boolean)
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return (self.customer_id)
+
+
+@manager.user_loader
+def load_user(customer_id):
+    return Customers.query.get(int(customer_id))

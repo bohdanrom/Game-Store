@@ -46,13 +46,13 @@
 				                        <div class="navbar-nav">
 					                            <a
                                                     {% if customer %}
-                                                        href="/"
+                                                        href="{{ url_for('edit_profile') }}"
                                                     {% else %}
                                                         href="#" onclick="show('block')"
                                                     {% endif %} class="nav-item nav-link user_photo">
                                                     <img height="60" width="60" class="user_ico"
                                                             {% block user_icos %}
-                                                                {% if customer %}
+                                                                {% if customer and customer.customer_photo is not none %}
                                                                     src="data:image/jpeg;base64,{{ customer.customer_photo }}"
                                                                 {% else %}
                                                                     src="./static/pngegg.png"
@@ -60,7 +60,7 @@
                                                             {% endblock %} alt="user_photo">
                                                 </a>
 				                        </div>
-                                        <div class="navbar-nav">
+                                        <div class="navbar-nav user_names">
 					                            <p class="user_first_name">
                                                     {% if customer %}
                                                         {{ customer.customer_first_name }}
@@ -89,6 +89,16 @@
 		        </div>
 	    </header>
 	    <section class="main">
+                {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                                <ul class=flashes>
+                                        {% for message in messages %}
+                                                <li>{{ message }}</li>
+                                        {% endfor %}
+                                </ul>
+                        {% endif %}
+                {% endwith %}
+                {% block body %}{% endblock %}
                 <div id="gray">
                         <div id="modal">
                                 <img src="./static/close.png" alt="" onclick="show('none')" class="close">

@@ -500,3 +500,16 @@ header, footer{
 .reg_form_new{
     display: none;
 }
+.user_names{
+    display: block;
+}
+.edit_user{
+    margin: 0 auto;
+}
+.user_fields{
+    display: flex;
+    flex-direction: column;
+}
+.new_profile_detail{
+    margin-bottom: 10px;
+}

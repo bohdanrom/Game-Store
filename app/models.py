@@ -27,7 +27,7 @@ class Mixin():
 class Games(db.Model, Mixin):
     __tablename__ = 'games'
     game_id = db.Column(db.Integer, primary_key=True)
-    game_name = db.Column(db.String(255), nullable=False, unique=True)
+    game_name = db.Column(db.String(100), nullable=False, unique=True)
     game_description = db.Column(db.Text, nullable=False)
     release_date = db.Column(db.Date, nullable=False, default=date.today())
     number_of_players = db.Column(db.Integer, default=0)
@@ -50,25 +50,32 @@ class GameImages(db.Model, Mixin):
 class Platforms(db.Model, Mixin):
     __tablename__ = 'platforms'
     platform_id = db.Column(db.Integer, primary_key=True)
-    platform_name = db.Column(db.String(255), nullable=False)
+    platform_name = db.Column(db.String(50), nullable=False)
     platform_ico = game_photo = db.Column(db.LargeBinary, nullable=False)
 
 
 class GameGenres(db.Model, Mixin):
     __tablename__ = 'game_genres'
     game_type_id = db.Column(db.Integer, primary_key=True)
-    game_type_name = db.Column(db.String(255), nullable=False)
+    game_type_name = db.Column(db.String(50), nullable=False)
+
+
+class Roles(db.Model):
+    __tablename__ = 'roles'
+    role_id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
 
 
 class Customers(db.Model, UserMixin):
     __tablename__ = 'customers'
     customer_id = db.Column(db.Integer, primary_key=True)
-    customer_email = db.Column(db.String(255), unique=True, nullable=False)
-    customer_password = db.Column(db.String(255), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.role_id'))
+    customer_email = db.Column(db.String(128), unique=True, nullable=False)
+    customer_password = db.Column(db.String(128), nullable=False)
     customer_photo = db.Column(db.LargeBinary)
-    customer_first_name = db.Column(db.String(255))
-    customer_last_name = db.Column(db.String(255))
-    manager_permission = db.Column(db.Boolean)
+    customer_first_name = db.Column(db.String(30))
+    customer_last_name = db.Column(db.String(30))
+    role = db.relationship("Roles", backref=db.backref('roles'), uselist=False)
 
     def is_authenticated(self):
         return True
@@ -85,4 +92,4 @@ class Customers(db.Model, UserMixin):
 
 @manager.user_loader
 def load_user(customer_id):
-    return Customers.query.get(int(customer_id))
+    return Customers.query.get(customer_id)

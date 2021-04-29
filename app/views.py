@@ -1,10 +1,10 @@
 import base64
 
-from flask import render_template, request, redirect, jsonify, flash, url_for, session
+from flask import render_template, request, redirect, jsonify, flash, url_for, session, g
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
-from app import app, db, models
+from app import app, db, models, manager
 
 
 def return_genres():
@@ -20,10 +20,21 @@ def redirect_to_login_page(response):
 
 
 @app.route('/add-game', methods=["GET", "POST"])
+@login_required
 def add_new_game():
+    try:
+        user_role = models.Customers.query.filter_by(customer_id=g.user).first().role.name
+    except AttributeError:
+        user_role = 'Unauthorized User'
+    if 'User' in user_role:
+        return redirect('/')
     if request.method == 'POST':
         game_name = request.form.get('new_game_name')
-        game_price = float(request.form.get('new_game_price'))
+        try:
+            game_price = float(request.form.get('new_game_price'))
+        except ValueError:
+            flash('Game price must be numeric!')
+            return redirect('#')
         game_genre = request.form.getlist('new_game_genre')
         game_description = request.form.get('new_game_description')
         game_image = request.files['new_game_ico'].read()
@@ -43,7 +54,7 @@ def add_new_game():
     return render_template('add_game.html', genres=return_genres())
 
 
-@app.route('/<int:game_id>', methods=["GET", "POST"])
+@app.route('/<int:game_id>', methods=["GET"])
 def display_game(game_id: int):
     game_details = models.Games.query.filter_by(game_id=game_id).first()
     game_photo = models.GameImages.query.filter_by(game_id=game_id).first()
@@ -51,36 +62,42 @@ def display_game(game_id: int):
     # platforms_ico = models.Games.query.join(models.games_and_platforms).join(models.Platforms).filter((models.games_and_platforms.c.game_id == models.Games.game_id) & (models.games_and_platforms.c.platform_id == models.Platforms.platform_id)).all()
     # platforms_ico = [base64.b64encode(elem.platform_ico).decode("utf-8") for elem in game_details.platforms]
     game_image = base64.b64encode(game_photo.game_photo).decode("utf-8")
-
-    if request.method == "POST":
-        # file = request.files['file'].read()
-        # file_name = form.name.data
-        print("POST-method")
-        return render_template("main-page.html")
     return render_template("game.html",
                            game_details=game_details,
-                           game_image=game_image,
-                           )
+                           game_image=game_image)
 
 
 @app.route('/<int:game_id>/edit', methods=["GET", "POST"])
 def edit_game(game_id: int):
-    game = models.Games.query.get(game_id)
-    game_image = models.GameImages.query.filter_by(game_id=game_id).first()
-    if request.method == "POST":
-        game.game_name = request.form.get('new_game_name')
-        game.price = float(request.form.get('new_game_price'))
-        game_genres = request.form.getlist('new_game_genre')
-        game.game_description = request.form.get('new_game_description')
-        game_image.game_photo = request.files['new_game_ico'].read()
-        if game_genres:
-            game.genres.clear()
-            for genre in models.GameGenres.query.all():
-                if genre.game_type_name in game_genres:
-                    game.genres.append(genre)
-        db.session.commit()
-        return redirect("/")
-    return render_template('add_game.html', game=game, game_image=game_image, genres=return_genres())
+    try:
+        user_role = models.Customers.query.filter_by(customer_id=g.user).first().role.name
+    except AttributeError:
+        user_role = 'Unauthorized User'
+    if 'User' in user_role:
+        return redirect(f'/{game_id}')
+    else:
+        game = models.Games.query.get(game_id)
+        game_image = models.GameImages.query.filter_by(game_id=game_id).first()
+        if request.method == "POST":
+            game.game_name = request.form.get('new_game_name')
+            try:
+                game.price = float(request.form.get('new_game_price'))
+            except ValueError:
+                flash('Game price must be numeric!')
+                return redirect('#')
+            game_genres = request.form.getlist('new_game_genre')
+            game.game_description = request.form.get('new_game_description')
+            game_new_image = request.files['new_game_ico'].read()
+            if game_genres:
+                game.genres.clear()
+                for genre in models.GameGenres.query.all():
+                    if genre.game_type_name in game_genres:
+                        game.genres.append(genre)
+            if game_new_image:
+                game_image.game_photo = game_new_image
+            db.session.commit()
+            return redirect("/")
+        return render_template('add_game.html', game=game, game_image=game_image, genres=return_genres())
 
 
 @app.route('/')
@@ -88,16 +105,13 @@ def display_all_games():
     all_games = models.Games.query.order_by(models.Games.game_id).all()
     raw_game_images = models.GameImages.query.order_by(models.GameImages.game_id).all()
     game_images = [base64.b64encode(elem.game_photo).decode("utf-8") for elem in raw_game_images]
-    # try:
-    #     customer_id = int(request.args.get('user_data'))
-    #     customer = models.Customers.query.get(customer_id=customer_id)
-    # except:
-        # customer = models.Customers.query.get(1)
+    print(g.user)
+    print(g.admin_perm)
     return render_template('all_games.html',
                            all_games=all_games,
                            game_images=game_images,
-                           genres=return_genres())
-                           # customer=customer)
+                           genres=return_genres(),
+                           login=g.admin_perm)
 
 
 @app.route('/search', methods=["POST"])
@@ -128,15 +142,16 @@ def login():
             user_credentials = models.Customers.query.filter_by(customer_email=user_login).first()
             if user_credentials and check_password_hash(user_credentials.customer_password, user_password):
                 login_user(user_credentials)
+                session['customer_first_name'] = user_credentials.customer_first_name
+                session['customer_last_name'] = user_credentials.customer_last_name
                 # next_page = request.args.get('next')
                 # return redirect(next_page)
-                return redirect(url_for('display_all_games', user_data=user_credentials.get_id()))
-            else:
-                flash("Invalid credentials")
+                return redirect(url_for('display_all_games'))
+            return redirect('/login')
         else:
             flash('Please, fill both fields email and password')
-        return redirect(url_for('login'))
-    return render_template('index.html')
+        return redirect(url_for('display_all_games'))
+    return redirect(url_for('display_all_games'))
 
 
 @app.route('/signup', methods=["POST", "GET"])
@@ -160,6 +175,8 @@ def signup():
                                             customer_password=hash_password)
                 db.session.add(new_user)
                 db.session.commit()
+                session['customer_first_name'] = new_user_first_name.customer_first_name
+                session['customer_last_name'] = new_user_last_name.customer_last_name
                 login_user(new_user)
                 return redirect(url_for('display_all_games'))
     return redirect(url_for('display_all_games'))
@@ -168,6 +185,8 @@ def signup():
 @app.route('/logout', methods=["POST", "GET"])
 @login_required
 def logout():
+    session.pop('customer_first_name', None)
+    session.pop('customer_last_name', None)
     logout_user()
     return redirect(url_for('display_all_games'))
 
@@ -175,8 +194,32 @@ def logout():
 @app.route('/edit_profile')
 @login_required
 def edit_profile():
-    customer = models.Customers.query.get(1)
+    customer = current_user
+    print(customer)
     return render_template('user_profile.html', customer=customer)
+
+
+@manager.user_loader
+def load_user(customer_id):
+    if customer_id is not None:
+        return models.Customers.query.get(customer_id)
+    return None
+
+
+@manager.unauthorized_handler
+def unauthorized():
+    flash('You must be logged in to view that page.')
+    return redirect(url_for('display_all_games'))
+
+
+@app.before_request
+def load_users():
+    if current_user.is_authenticated:
+        g.user = current_user.get_id()
+        g.admin_perm = current_user.role.name
+    else:
+        g.user = None
+        g.admin_perm = None
 
 
 if __name__ == '__main__':

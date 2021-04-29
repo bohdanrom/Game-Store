@@ -12,9 +12,11 @@
                                 </ul>
                 </div>
                 <div class="search_div">
+                    {% if login == 'Admin' %}
                         <div class="add_game_button">
                                 <a href="/add-game" class="add_game">Add game</a>
                         </div>
+                    {% endif %}
                         <form action="{{ url_for('search') }}" class="search" id="search" method="post">
                                 <input type="search" class="search_game" name="search" id="live_search" placeholder="Enter game name">
                         </form>
@@ -93,5 +95,16 @@
                         else
                                 checkList.classList.add('visible');
         }
+</script>
+<script>
+        $( document ).ready(function(){
+              $( ".game_photo_div" ).hover(function(){
+                    $( ".game_photo_div" ).css('background', '#ffffff1  0')
+                        .fadeTo( "slow" , 0.9);
+                    }, function(){ // задаем функцию, которая срабатывает, когда указатель выходит из элемента
+                    $( ".game_photo_div" )// задаем цвет заднего фона
+                        .text("Курсор вышел из элемента"); // задаем текстовое содержимое
+              });
+	    });
 </script>
 {% endblock %}

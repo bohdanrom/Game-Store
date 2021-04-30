@@ -50,8 +50,8 @@ def add_new_game():
                                               game_photo=game_image)
         db.session.add(new_game_image)
         db.session.commit()
-        return render_template('add_game.html')
-    return render_template('add_game.html', genres=return_genres())
+        return render_template('add_game.html', user_photo=g.photo)
+    return render_template('add_game.html', user_photo=g.photo, genres=return_genres())
 
 
 @app.route('/<int:game_id>', methods=["GET"])
@@ -64,7 +64,8 @@ def display_game(game_id: int):
     game_image = base64.b64encode(game_photo.game_photo).decode("utf-8")
     return render_template("game.html",
                            game_details=game_details,
-                           game_image=game_image)
+                           game_image=game_image,
+                           user_photo=g.photo)
 
 
 @app.route('/<int:game_id>/edit', methods=["GET", "POST"])
@@ -97,7 +98,11 @@ def edit_game(game_id: int):
                 game_image.game_photo = game_new_image
             db.session.commit()
             return redirect("/")
-        return render_template('add_game.html', game=game, game_image=game_image, genres=return_genres())
+        return render_template('add_game.html',
+                               game=game,
+                               game_image=game_image,
+                               user_photo=g.photo,
+                               genres=return_genres())
 
 
 @app.route('/')
@@ -105,13 +110,12 @@ def display_all_games():
     all_games = models.Games.query.order_by(models.Games.game_id).all()
     raw_game_images = models.GameImages.query.order_by(models.GameImages.game_id).all()
     game_images = [base64.b64encode(elem.game_photo).decode("utf-8") for elem in raw_game_images]
-    print(g.user)
-    print(g.admin_perm)
     return render_template('all_games.html',
                            all_games=all_games,
                            game_images=game_images,
                            genres=return_genres(),
-                           login=g.admin_perm)
+                           login=g.admin_perm,
+                           user_photo=base64.b64encode(current_user.customer_photo).decode("utf-8"))
 
 
 @app.route('/search', methods=["POST"])
@@ -146,12 +150,12 @@ def login():
                 session['customer_last_name'] = user_credentials.customer_last_name
                 # next_page = request.args.get('next')
                 # return redirect(next_page)
-                return redirect(url_for('display_all_games'))
+                return redirect(url_for('display_all_games', user_photo=g.photo))
             return redirect('/login')
         else:
             flash('Please, fill both fields email and password')
         return redirect(url_for('display_all_games'))
-    return redirect(url_for('display_all_games'))
+    return redirect(url_for('display_all_games', user_photo=g.photo))
 
 
 @app.route('/signup', methods=["POST", "GET"])
@@ -160,6 +164,7 @@ def signup():
         new_user_first_name = request.form.get('first_name')
         new_user_last_name = request.form.get('last_name')
         new_user_login = request.form.get('email')
+        new_user_username = request.form.get('user_name')
         new_user_password = request.form.get('password')
         new_user_password_verification = request.form.get('password_two')
         if not(new_user_first_name or new_user_last_name or new_user_login or new_user_password or new_user_password_verification):
@@ -171,15 +176,17 @@ def signup():
                 hash_password = generate_password_hash(new_user_password)
                 new_user = models.Customers(customer_first_name=new_user_first_name,
                                             customer_last_name=new_user_last_name,
+                                            customer_username = new_user_username,
                                             customer_email=new_user_login,
-                                            customer_password=hash_password)
+                                            customer_password=hash_password,
+                                            role=models.Roles.get(1))
                 db.session.add(new_user)
                 db.session.commit()
-                session['customer_first_name'] = new_user_first_name.customer_first_name
-                session['customer_last_name'] = new_user_last_name.customer_last_name
+                session['customer_first_name'] = new_user.customer_first_name
+                session['customer_last_name'] = new_user.customer_last_name
                 login_user(new_user)
-                return redirect(url_for('display_all_games'))
-    return redirect(url_for('display_all_games'))
+                return redirect(url_for('display_all_games', user_photo=g.photo))
+    return redirect(url_for('display_all_games', user_photo=g.photo))
 
 
 @app.route('/logout', methods=["POST", "GET"])
@@ -191,12 +198,26 @@ def logout():
     return redirect(url_for('display_all_games'))
 
 
-@app.route('/edit_profile')
+@app.route('/edit_profile', methods=["GET", "POST"])
 @login_required
 def edit_profile():
-    customer = current_user
-    print(customer)
-    return render_template('user_profile.html', customer=customer)
+    if request.method == "POST":
+        new_first_name = request.form.get('new_first_name')
+        new_last_name = request.form.get('new_last_name')
+        new_user_photo = request.files['new_user_ico'].read()
+        if new_first_name and new_last_name:
+            current_user.customer_first_name = new_first_name
+            current_user.customer_last_name = new_last_name
+            if new_user_photo:
+                current_user.customer_photo = new_user_photo
+        db.session.commit()
+        session['customer_first_name'] = current_user.customer_first_name
+        session['customer_last_name'] = current_user.customer_last_name
+        session.modified = True
+        return redirect(url_for('display_all_games'))
+    return render_template('user_profile.html',
+                           customer=current_user,
+                           user_photo=base64.b64encode(current_user.customer_photo).decode("utf-8"))
 
 
 @manager.user_loader
@@ -215,11 +236,18 @@ def unauthorized():
 @app.before_request
 def load_users():
     if current_user.is_authenticated:
-        g.user = current_user.get_id()
-        g.admin_perm = current_user.role.name
+        try:
+            g.user = current_user.get_id()
+            g.admin_perm = current_user.role.name
+            g.photo = base64.b64encode(current_user.customer_photo).decode("utf-8")
+        except AttributeError:
+            g.user = None
+            g.admin_perm = None
+            g.photo = None
     else:
         g.user = None
         g.admin_perm = None
+        g.photo = None
 
 
 if __name__ == '__main__':

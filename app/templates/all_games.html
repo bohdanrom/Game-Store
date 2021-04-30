@@ -1,6 +1,51 @@
 {% extends "index.html" %}
 {% block title %}All Games{% endblock %}
 {% block content %}
+<style>
+.overlay{
+    position: relative;
+    width: 30%;
+    margin-right: 20px;
+}
+.game_photo_div{
+    width: 100%;
+    opacity: 1;
+    display: block;
+    transition: .5s ease;
+    backface-visibility: hidden;
+    margin-bottom: 20px;
+}
+{% if login == 'Admin' %}
+.admin_overlay {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+}
+.overlay:hover .game_photo_div {
+    opacity: 0.3;
+}
+.overlay:hover .admin_overlay {
+    opacity: 1;
+}
+.admin_img {
+    padding: 20px;
+    margin-right: 5px;
+}
+.hover_img{
+    z-index: 10;
+    left: 50%;
+    top: 35%;
+}
+.hover_img:hover{
+    transform: scale(1.2);
+}
+{% endif %}
+</style>
 <div class="row">
         <div class="filer_and_search">
                 <div id="filter" class="filter-dropdown-check-list" tabindex="100">
@@ -26,32 +71,42 @@
 <div class="row">
         <div class="all_games" id="all_games">
                 {% for data, photo in all_games|zip(game_images) %}
-                        <div class="game_photo_div" game_id="{{ data.game_id }}">
-                                <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
-                                        <img src="data:image/jpeg;base64,{{ photo }}" height="170" alt="game_img" class="game_ico" id="game_ico">
-                                </a>
-                                <div class="game_information" id="game_information">
-                                        <div class="price_and_button" id="price_and_button">
-                                                <p class="game-price" id="game-price">{{ data.price }}$</p>
-                                                <div class="buttons" id="buttons">
-                                                        <a href="#" class="buy-button" id="buy-button">BUY</a>
+                        <div class="overlay">
+                                <div class="game_photo_div" game_id="{{ data.game_id }}">
+                                        <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
+                                                <img src="data:image/jpeg;base64,{{ photo }}" height="170" alt="game_img" class="game_ico" id="game_ico">
+                                        </a>
+                                        {% if login == 'Admin' %}
+                                                <div class="admin_overlay">
+                                                        <a href="{{ url_for('edit_game', game_id=data.game_id) }}" class="admin_img"><img src="./static/white_pencil.png" alt="" height="60" class="hover_img"></a>
+                                                        <a href="#" class="admin_img"><img src="./static/bin.png" alt="" height="60" class="hover_img"></a>
                                                 </div>
-                                        </div>
-                                        <div class="game_genres_and_name" id="game_genres_and_name">
-                                                <div class="game_genres_for_one" id="game_genres_for_one">
-                                                        {% for genre in data.genres %}
-                                                                <p class="game-genre" id="game-genre">
-                                                                        {% if data.genres|length > 1 %}
-                                                                                {{ genre.game_type_name }} / <!--ТРЕБА ПРИДУМАТИ ЯК ЗАБРАТИ СЛЕШ ВКІНЦІ-->
-                                                                        {% else %}
-                                                                                {{ genre.game_type_name }}
-                                                                        {% endif %}
-                                                                </p>
-                                                        {% endfor %}
+                                        {% endif %}
+                                        <div class="game_information" id="game_information">
+                                                <div class="price_and_button" id="price_and_button">
+                                                        <p class="game-price" id="game-price">{{ data.price }}$</p>
+                                                                <div class="buttons" id="buttons">
+                                                                        <a href="#" class="buy-button" id="buy-button">BUY</a>
+                                                                </div>
                                                 </div>
-                                                <h4 class="game-name" id="game-name">{{ data.game_name }}</h4>
+                                                <div class="game_genres_and_name" id="game_genres_and_name">
+                                                        <div class="game_genres_for_one" id="game_genres_for_one">
+                                                                {% for genre in data.genres %}
+                                                                        <p class="game-genre" id="game-genre">
+                                                                                {% if data.genres|length > 1 %}
+                                                                                        {{ genre.game_type_name }} / <!--ТРЕБА ПРИДУМАТИ ЯК ЗАБРАТИ СЛЕШ ВКІНЦІ-->
+                                                                                {% else %}
+                                                                                        {{ genre.game_type_name }}
+                                                                                {% endif %}
+                                                                        </p>
+                                                                {% endfor %}
+                                                        </div>
+                                                <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref">
+                                                        <h4 class="game-name" id="game-name">{{ data.game_name }}</h4>
+                                                </a>
                                         </div>
                                 </div>
+                            </div>
                         </div>
                 {% endfor %}
         </div>
@@ -95,16 +150,5 @@
                         else
                                 checkList.classList.add('visible');
         }
-</script>
-<script>
-        $( document ).ready(function(){
-              $( ".game_photo_div" ).hover(function(){
-                    $( ".game_photo_div" ).css('background', '#ffffff1  0')
-                        .fadeTo( "slow" , 0.9);
-                    }, function(){ // задаем функцию, которая срабатывает, когда указатель выходит из элемента
-                    $( ".game_photo_div" )// задаем цвет заднего фона
-                        .text("Курсор вышел из элемента"); // задаем текстовое содержимое
-              });
-	    });
 </script>
 {% endblock %}

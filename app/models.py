@@ -72,6 +72,7 @@ class Customers(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.role_id'))
     customer_email = db.Column(db.String(128), unique=True, nullable=False)
     customer_password = db.Column(db.String(128), nullable=False)
+    customer_username = db.Column(db.String(64),nullable=False, unique=True)
     customer_photo = db.Column(db.LargeBinary)
     customer_first_name = db.Column(db.String(30))
     customer_last_name = db.Column(db.String(30))

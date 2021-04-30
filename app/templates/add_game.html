@@ -25,7 +25,7 @@
                                 </div>
                                 <div class="image_and_button">
                                         <div class="input__wrapper">
-                                                <input type="file" name="new_game_ico" accept="image/*" id="input__file" class="input input__file" {% if game_image %} value="{{ game_image.game_image }}" {% endif %}multiple>
+                                                <input type="file" name="new_game_ico" accept="image/*" id="input__file" class="input input__file" {% if game_image %} value="{{ game_image.game_image }}" {% endif %} multiple>
                                                         <label for="input__file" class="input__file-button">
                                                                 <span class="input__file-icon-wrapper"><img class="input__file-icon" src="./static/kisspng_computer_icons_logo_download_incoming_5b2fe3dddadc97_07.png" alt="Choose game image" width="30"></span>
                                                                 <span class="input__file-button-text">Choose game image</span>
@@ -48,21 +48,20 @@
         }
 </script>
 <script>
-var file = document.getElementById('input__file');
-
-file.onchange = function(e) {
-  var ext = this.value.match(/\.([^\.]+)$/)[1];
-  switch (ext) {
-    case 'jpg':
-    case 'bmp':
-    case 'png':
-    case 'jpeg':
-    case 'ico':
-      break;
-    default:
-      alert("This format of file isn't allowed");
-      this.value = '';
-  }
-};
+    let file = document.getElementById('input__file');
+    file.onchange = function(e) {
+        let ext = this.value.match(/\.([^\.]+)$/)[1];
+            switch (ext) {
+                case 'jpg':
+                case 'bmp':
+                case 'png':
+                case 'jpeg':
+                case 'ico':
+            break;
+            default:
+                alert("This format of file isn't allowed");
+            this.value = '';
+        }
+    };
 </script>
 {% endblock %}

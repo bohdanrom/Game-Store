@@ -52,7 +52,7 @@
                         <span class="anchor">Select Game Genres</span>
                                 <ul class="items">
                                         {% for genre in genres %}
-                                                 <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{{genre.game_type_name}}</li>
+                                                 <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{% if genre.game_type_name == '' %}Games without genre {% else %} {{genre.game_type_name}} {% endif %}</li>
                                         {% endfor %}
                                 </ul>
                 </div>
@@ -62,8 +62,8 @@
                                 <a href="/add-game" class="add_game">Add game</a>
                         </div>
                     {% endif %}
-                        <form action="{{ url_for('search') }}" class="search" id="search" method="post">
-                                <input type="search" class="search_game" name="search" id="live_search" placeholder="Enter game name">
+                        <form class="search" id="search" method="post">
+                                <input type="text" class="search_game" name="search" id="live_search" placeholder="Enter game name" onkeyup="myFunction()">
                         </form>
                 </div>
         </div>
@@ -74,7 +74,7 @@
                         <div class="overlay">
                                 <div class="game_photo_div" game_id="{{ data.game_id }}">
                                         <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
-                                                <img src="data:image/jpeg;base64,{{ photo }}" height="170" alt="game_img" class="game_ico" id="game_ico">
+                                                <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} './static/mark.jpg' {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
                                         </a>
                                         {% if login == 'Admin' %}
                                                 <div class="admin_overlay">
@@ -112,43 +112,32 @@
         </div>
 </div>
 <script>
-        $(document).ready(function () {
-            $('#live_search').on('keyup', function () {
-                let search = $(this).val();
-                if (search.length > 3) {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/search',
-                        data: {'game_name': search},
-                        success: function (msg) {
-                            let indexArray = []
-                            if (msg != '') {
-                                for (let i = 0; i < msg.length; i++) {
-                                    indexArray.push(msg[i].game_id)
-                                }
-                                let divs = document.getElementsByClassName('game_photo_div');
-                                for (let i = 0; i < divs.length; i++) {
-                                    if (indexArray.includes(Number(divs[i].getAttribute('game_id')))) {
-                                        //pass
-                                    }
-                                    else {
-                                        divs[i].style.display = 'none';
-                                    }
-                                }
-                            }
-                        }
-                    });
+    function myFunction() {
+        let input, filter, allGames, game, listOfGames, i, txtValue;
+        input = document.getElementById("live_search");
+        filter = input.value.toUpperCase();
+        allGames = document.getElementById("all_games");
+        game = allGames.getElementsByClassName('overlay');
+        for (i = 0; i < game.length; i++) {
+            listOfGames = game[i].getElementsByClassName("game-name")[0];
+            if (listOfGames) {
+                txtValue = listOfGames.textContent || listOfGames.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    game[i].style.display = "";
+            } else {
+                game[i].style.display = "none";
                 }
-            });
-        });
+            }
+        }
+    }
 </script>
 <script>
         let checkList = document.getElementById('filter');
-                checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
-                        if (checkList.classList.contains('visible'))
-                                checkList.classList.remove('visible');
-                        else
-                                checkList.classList.add('visible');
-        }
+            checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
+                if (checkList.classList.contains('visible'))
+                    checkList.classList.remove('visible');
+                else
+                    checkList.classList.add('visible');
+            }
 </script>
 {% endblock %}

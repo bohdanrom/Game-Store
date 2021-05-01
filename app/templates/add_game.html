@@ -11,12 +11,12 @@
                 <div class="new_game">
                         <form {% if game %} action="{{ url_for('edit_game', game_id=game.game_id)}}" {% else %} action="{{ url_for('add_new_game') }}" {% endif %} class="game_fields" method="post" enctype="multipart/form-data">
                                 <input type="text" class="new_game_detail" id="new_game_name" name="new_game_name" placeholder="Enter game name" {% if game %} value="{{ game.game_name }}" {% endif %} required>
-                                <input type="text" class="new_game_detail" id="new_game_price" name="new_game_price" placeholder="Enter game price" {% if game %} value="{{ game.price }}" {% endif %}>
+                                <input type="text" class="new_game_detail" id="new_game_price" name="new_game_price" placeholder="Enter game price(less than 1000)" {% if game %} value="{{ game.price }}" {% endif %}>
                                 <div id="genres" class="dropdown-check-list" tabindex="100">
                                         <span class="anchor">Select Game Genres</span>
                                                 <ul class="items">
                                                         {% for genre in genres %}
-                                                                 <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{{genre.game_type_name}}</li>
+                                                                 <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{% if genre.game_type_name == '' %}{% if game %}Delete all genres from game {% else %} Add without genre {% endif %} {% else %} {{genre.game_type_name}} {% endif %}</li>
                                                         {% endfor %}
                                                 </ul>
                                 </div>
@@ -32,7 +32,7 @@
                                                         </label>
                                         </div>
                                         <div class="submit_button">
-                                                <input type="submit" class="new_game_add_button" value="Add game">
+                                                <input type="submit" class="edit_game_add_button" {% if game %} value="Change game" {% else %} value="Add game" {% endif %}>
                                         </div>
                                 </div>
                         </form>

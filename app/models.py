@@ -19,12 +19,7 @@ games_and_platforms = db.Table(
 )
 
 
-class Mixin():
-    def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
-
-class Games(db.Model, Mixin):
+class Games(db.Model):
     __tablename__ = 'games'
     game_id = db.Column(db.Integer, primary_key=True)
     game_name = db.Column(db.String(100), nullable=False, unique=True)
@@ -33,13 +28,14 @@ class Games(db.Model, Mixin):
     number_of_players = db.Column(db.Integer, default=0)
     quantity_available = db.Column(db.Integer, default=2000)
     price = db.Column(db.Numeric(5, 2))
+    is_active = db.Column(db.Boolean, default=True)
     genres = db.relationship("GameGenres", secondary=games_and_game_genres,
                              lazy='subquery', backref=db.backref('classes', lazy=True))
     platforms = db.relationship("Platforms", secondary=games_and_platforms,
                                 lazy='subquery', backref=db.backref('classes', lazy=True))
 
 
-class GameImages(db.Model, Mixin):
+class GameImages(db.Model):
     __tablename__ = 'game_images'
     game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'))
     game_image_id = db.Column(db.Integer, primary_key=True)
@@ -47,14 +43,14 @@ class GameImages(db.Model, Mixin):
     game = db.relationship("Games", backref=db.backref("games", uselist=False))
 
 
-class Platforms(db.Model, Mixin):
+class Platforms(db.Model):
     __tablename__ = 'platforms'
     platform_id = db.Column(db.Integer, primary_key=True)
     platform_name = db.Column(db.String(50), nullable=False)
     platform_ico = game_photo = db.Column(db.LargeBinary, nullable=False)
 
 
-class GameGenres(db.Model, Mixin):
+class GameGenres(db.Model):
     __tablename__ = 'game_genres'
     game_type_id = db.Column(db.Integer, primary_key=True)
     game_type_name = db.Column(db.String(50), nullable=False)

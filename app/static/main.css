@@ -62,6 +62,10 @@ header, footer{
 .user_photo{
     margin-right: 10px;
 }
+.user_edit_photo{
+    width: 100%;
+    height: auto;
+}
 .user_first_name{
     color: #ffffff;
     margin-right: 5px;
@@ -194,7 +198,6 @@ header, footer{
 .game_photo_div{
     color: #ffffff;
     width: 90%;
-    /*margin-bottom: 30px;*/
 }
 .buy-button{
     color: rgba(255,255,255,0.85);
@@ -317,6 +320,18 @@ header, footer{
     border:0 none;
     border-radius: 0 3px 3px 0;
 }
+.edit_game_add_button{
+    background: #20c579;
+    font-size: 0.9rem;
+    color: #ffffff;
+    font-weight: bold;
+    outline: none;
+    width: 100px;
+    height: 60px;
+    line-height: 1;
+    border:0 none;
+    border-radius: 0 3px 3px 0;
+}
 .input__wrapper {
     width: 100%;
     position: relative;
@@ -345,7 +360,8 @@ header, footer{
 }
 .input__file-button-text {
     line-height: 1;
-    margin-top: 1px;
+    font-size: 0.9rem;
+    margin: 1px auto;
 }
 .input__file-button {
     width: 100%;
@@ -506,6 +522,11 @@ header, footer{
 }
 .edit_user{
     margin: 65px auto;
+    position: relative;
+    width: 250px;
+    height: 250px;
+    overflow: hidden;
+    border-radius: 50%;
 }
 .user_fields{
     display: flex;

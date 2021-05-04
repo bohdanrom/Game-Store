@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from flask_login import UserMixin
 
@@ -90,3 +90,16 @@ class Customers(db.Model, UserMixin):
 @manager.user_loader
 def load_user(customer_id):
     return Customers.query.get(customer_id)
+
+
+class Comments(db.Model):
+    __tablename__ = 'comments'
+    comment_id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text)
+    game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'))
+    author_username = db.Column(db.String(64), db.ForeignKey('customers.customer_username'))
+    timestamp = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('comments.comment_id'))
+    replies = db.relationship('Comments', backref=db.backref('comments', remote_side=[comment_id]), lazy='dynamic')
+    author = db.relationship("Customers", backref=db.backref('customers'), uselist=False)
+    game = db.relationship("Games", backref=db.backref('game'), uselist=False)

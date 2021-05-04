@@ -45,11 +45,54 @@
                                 <p class="game_description_text">{{game_details.game_description}}</p>
                         </div>
                 </div>
-                <div>
-                        <p style="color: #ffffff" class="release_date">{{game_details.release_date}}</p>
-                        <p style="color: #ffffff" class="number_of_players">{{game_details.number_of_players}}</p>
-                        <p style="color: #ffffff" class="quantity_available">{{game_details.quantity_available}}</p>
+                <div class="comments">
+                        <div class="all_comments">
+                                {% for comment, ico in game_comments|zip(comment_authors_images) %}
+                                        {% if not comment.parent_id %}
+                                                <div class="user_comment">
+                                                        <div class="comment_author_image">
+                                                                <img src="data:image/jpeg;base64, {{ ico }}" alt="comment_author_ico" height="50" class="comment_author">
+                                                                <p class="comment_owner">{{ comment.author_username }}</p>
+                                                        </div>
+                                                        <div class="comment_div">
+                                                                <p class="comment_text">{{ comment.text }}</p>
+                                                                {% if not comment.parent_id %}
+                                                                        <p onclick="parentReply({{ comment.comment_id }})" class="reply">Reply</p>
+                                                                        {% for sub_comment, sub_ico in game_sub_comments|zip(sub_comment_authors_images) %}
+                                                                                {% if sub_comment.parent_id == comment.comment_id %}
+                                                                                        <div class="sub comment_div">
+                                                                                                <div class="sub comment_author_image">
+                                                                                                        <img src="data:image/jpeg;base64, {{ sub_ico }}" alt="comment_author_ico" height="50" class="comment_author">
+                                                                                                        <p class="comment_owner">{{ sub_comment.author_username }}</p>
+                                                                                                </div>
+                                                                                                <div class="sub comment_div">
+                                                                                                        <p class="comment_text">{{ sub_comment.text }}</p>
+                                                                                                </div>
+                                                                                        </div>
+                                                                                {% endif %}
+                                                                        {% endfor %}
+                                                                {% endif %}
+                                                        </div>
+                                                </div>
+                                        {% endif %}
+                                {% endfor %}
+                        </div>
+                        <div class="add_comment">
+                                <form action="" method="post" class="customer_comments">
+                                        <input type="hidden" name='parent' id="parent_comment" class="parent_comment" value="">
+                                        <textarea class="comment" maxlength="256" name='comment' placeholder="What do you think about {{ game_details.game_name }}?"></textarea>
+                                        <input class="add_comment_input" type="submit" value="Add comment">
+                                </form>
+                        </div>
+{#                        <p style="color: #ffffff" class="release_date">{{game_details.release_date}}</p>#}
+{#                        <p style="color: #ffffff" class="number_of_players">{{game_details.number_of_players}}</p>#}
+{#                        <p style="color: #ffffff" class="quantity_available">{{game_details.quantity_available}}</p>#}
                 </div>
         </div>
 </div>
+<script>
+        function parentReply(commentId){
+            document.getElementById('parent_comment').value = commentId;
+        }
+</script>
 {% endblock %}

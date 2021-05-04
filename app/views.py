@@ -1,6 +1,6 @@
 import base64
 
-from flask import render_template, request, redirect, jsonify, flash, url_for, session, g
+from flask import render_template, request, redirect, flash, url_for, session, g
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -12,26 +12,44 @@ def return_genres():
     return genres
 
 
+def convert_image_from_binary_to_unicode(image):
+    try:
+        decoded_image = base64.b64encode(image).decode("utf-8")
+    except AttributeError:
+        decoded_image = None
+    except TypeError:
+        decoded_image = None
+    return decoded_image
+
+
+def admin_permission():
+    try:
+        user_role = models.Customers.query.filter_by(customer_id=g.user).first().role.name
+    except AttributeError:
+        user_role = 'Unauthorized User'
+    return user_role
+
+
 @app.after_request
 def redirect_to_login_page(response):
     if response.status_code == 401:
-        return redirect(url_for('login')+'?next='+request.url)
+        return redirect(url_for('login') + '?next=' + request.url)
     return response
 
 
 @app.route('/add-game', methods=["GET", "POST"])
 @login_required
 def add_new_game():
-    try:
-        user_role = models.Customers.query.filter_by(customer_id=g.user).first().role.name
-    except AttributeError:
-        user_role = 'Unauthorized User'
-    if 'User' in user_role:
+    if 'User' in admin_permission():
         return redirect('/')
     if request.method == 'POST':
         game_name = request.form.get('new_game_name')
         try:
-            game_price = float(request.form.get('new_game_price'))
+            if float(request.form.get('new_game_price')):
+                if float(request.form.get('new_game_price')) < 1000:
+                    game_price = float(request.form.get('new_game_price'))
+                else:
+                    game_price = 999.99
         except ValueError:
             flash('Game price must be numeric!')
             return redirect('#')
@@ -39,42 +57,87 @@ def add_new_game():
         game_description = request.form.get('new_game_description')
         game_image = request.files['new_game_ico'].read()
         new_game = models.Games(game_name=game_name,
-                                   game_description=game_description,
-                                   price=game_price)
-        for genre in models.GameGenres.query.all():
+                                game_description=game_description,
+                                price=game_price)
+        for genre in return_genres():
             if genre.game_type_name in game_genre:
                 new_game.genres.append(genre)
         db.session.add(new_game)
         db.session.commit()
+        if not game_image:
+            with open('./static/mark_edited2.png', 'rb') as default_photo:
+                game_image = default_photo.read()
         new_game_image = models.GameImages(game_id=new_game.game_id,
-                                              game_photo=game_image)
+                                           game_photo=game_image)
         db.session.add(new_game_image)
         db.session.commit()
-        return render_template('add_game.html', user_photo=g.photo)
+        return redirect(url_for('display_all_games'))
     return render_template('add_game.html', user_photo=g.photo, genres=return_genres())
 
 
-@app.route('/<int:game_id>', methods=["GET"])
+@app.route('/<int:game_id>', methods=["GET", "POST"])
 def display_game(game_id: int):
     game_details = models.Games.query.filter_by(game_id=game_id).first()
-    game_photo = models.GameImages.query.filter_by(game_id=game_id).first()
-    # НА ПЕРСПЕКТИВУ ЗРОБИТИ ПЛАТФОРМИ ТА ЇХ ВІДОБРАЖЕННЯ ІКОНОК
-    # platforms_ico = models.Games.query.join(models.games_and_platforms).join(models.Platforms).filter((models.games_and_platforms.c.game_id == models.Games.game_id) & (models.games_and_platforms.c.platform_id == models.Platforms.platform_id)).all()
-    # platforms_ico = [base64.b64encode(elem.platform_ico).decode("utf-8") for elem in game_details.platforms]
-    game_image = base64.b64encode(game_photo.game_photo).decode("utf-8")
-    return render_template("game.html",
-                           game_details=game_details,
-                           game_image=game_image,
-                           user_photo=g.photo)
+    if game_details.is_active:
+        if request.method == "POST":
+            if current_user.is_authenticated:
+                comment = request.form.get('comment')
+                if request.form.get('parent'):
+                    new_comment = models.Comments(text=comment, game_id=game_id,
+                                                  author_username=current_user.customer_username,
+                                                  parent_id=int(request.form.get('parent')))
+                else:
+                    new_comment = models.Comments(text=comment, game_id=game_id,
+                                                  author_username=current_user.customer_username)
+                db.session.add(new_comment)
+                db.session.commit()
+                return redirect(request.url)
+        game_photo = models.GameImages.query.filter_by(game_id=game_id).first()
+        print(game_photo)
+        game_comments = models.Comments.query.filter_by(game_id=game_id).order_by(models.Comments.comment_id).all()
+        game_sub_comments = models.Comments.query.filter_by(game_id=game_id).filter(
+            models.Comments.parent_id != None).order_by(models.Comments.comment_id).all()
+        comments_authors = [models.Customers.query.filter_by(customer_username=comment.author_username).order_by(models.Customers.customer_id).first()
+                            for comment in game_comments
+                            ]
+        sub_comment_authors = [models.Customers.query.filter_by(customer_username=comment.author_username).order_by(models.Customers.customer_id).first()
+                               for comment in game_sub_comments
+                               ]
+
+        def author_photos(list_of_authors: list):
+            comment_author_images = []
+            for author in list_of_authors:
+                if author.customer_photo is not None:
+                    comment_author_images.append(base64.b64encode(author.customer_photo).decode("utf-8"))
+                else:
+                    with open('./static/pngegg.png', 'rb') as default_photo:
+                        comment_author_images.append(base64.b64encode(default_photo.read()).decode("utf-8"))
+            return comment_author_images
+
+        comment_authors_images = author_photos(comments_authors)
+        sub_comment_authors_images = author_photos(sub_comment_authors)
+        # НА ПЕРСПЕКТИВУ ЗРОБИТИ ПЛАТФОРМИ ТА ЇХ ВІДОБРАЖЕННЯ ІКОНОК
+        # platforms_ico = models.Games.query.join(models.games_and_platforms).join(models.Platforms).filter((models.games_and_platforms.c.game_id == models.Games.game_id) & (models.games_and_platforms.c.platform_id == models.Platforms.platform_id)).all()
+        # platforms_ico = [base64.b64encode(elem.platform_ico).decode("utf-8") for elem in game_details.platforms]
+        game_image = convert_image_from_binary_to_unicode(game_photo.game_photo)
+        try:
+            g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
+        except AttributeError:
+            g.photo = None
+        return render_template("game.html",
+                               game_details=game_details,
+                               game_image=game_image,
+                               game_comments=game_comments,
+                               game_sub_comments=game_sub_comments,
+                               comment_authors_images=comment_authors_images,
+                               sub_comment_authors_images=sub_comment_authors_images,
+                               user_photo=g.photo)
+    return redirect('/')
 
 
-@app.route('/<int:game_id>/edit', methods=["GET", "POST"])
+@app.route('/edit/<int:game_id>', methods=["GET", "POST"])
 def edit_game(game_id: int):
-    try:
-        user_role = models.Customers.query.filter_by(customer_id=g.user).first().role.name
-    except AttributeError:
-        user_role = 'Unauthorized User'
-    if 'User' in user_role:
+    if 'User' in admin_permission():
         return redirect(f'/{game_id}')
     else:
         game = models.Games.query.get(game_id)
@@ -82,7 +145,11 @@ def edit_game(game_id: int):
         if request.method == "POST":
             game.game_name = request.form.get('new_game_name')
             try:
-                game.price = float(request.form.get('new_game_price'))
+                if float(request.form.get('new_game_price')):
+                    if float(request.form.get('new_game_price')) < 1000:
+                        game.price = float(request.form.get('new_game_price'))
+                    else:
+                        game.price = 999.99
             except ValueError:
                 flash('Game price must be numeric!')
                 return redirect('#')
@@ -91,7 +158,7 @@ def edit_game(game_id: int):
             game_new_image = request.files['new_game_ico'].read()
             if game_genres:
                 game.genres.clear()
-                for genre in models.GameGenres.query.all():
+                for genre in return_genres():
                     if genre.game_type_name in game_genres:
                         game.genres.append(genre)
             if game_new_image:
@@ -105,36 +172,43 @@ def edit_game(game_id: int):
                                genres=return_genres())
 
 
+@app.route('/hide_game', methods=["POST"])
+@login_required
+def hide_game():
+    if 'User' in admin_permission():
+        return redirect('/')
+    else:
+        game_id = request.json
+        game = models.Games.query.get(game_id)
+        if game.is_active:
+            game.is_active = False
+        else:
+            game.is_active = True
+        db.session.commit()
+
+
 @app.route('/')
 def display_all_games():
-    all_games = models.Games.query.order_by(models.Games.game_id).all()
-    raw_game_images = models.GameImages.query.order_by(models.GameImages.game_id).all()
-    game_images = [base64.b64encode(elem.game_photo).decode("utf-8") for elem in raw_game_images]
+    # print(current_user.customer_username)
+    if 'User' in admin_permission():
+        all_games = models.Games.query.order_by(models.Games.game_id).filter_by(is_active=True).all()
+    else:
+        all_games = models.Games.query.order_by(models.Games.game_id).all()
+    raw_game_images = [models.GameImages.query.filter_by(game_id=game.game_id).first() for game in all_games]
+    game_images = [convert_image_from_binary_to_unicode(elem.game_photo) for elem in raw_game_images]
+    try:
+        g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
+    except AttributeError:
+        g.photo = None
     return render_template('all_games.html',
                            all_games=all_games,
                            game_images=game_images,
                            genres=return_genres(),
                            login=g.admin_perm,
-                           user_photo=base64.b64encode(current_user.customer_photo).decode("utf-8"))
+                           user_photo=g.photo)
 
 
-@app.route('/search', methods=["POST"])
-def search():
-    game_name = request.form['game_name']
-    search = f"%{game_name}%"
-    raw_all_games = models.Games.query.filter(models.Games.game_name.like(search)).all()
-    game_ids, all_games = [], []
-    for game in raw_all_games:
-        game_ids.append(game.game_id)
-        all_games.append(game.as_dict())
-    raw_game_images = models.GameImages.query.order_by(models.GameImages.game_id in game_ids).all()
-    for index, element in enumerate(all_games):
-        element['game_image'] = base64.b64encode(raw_game_images[index].game_photo).decode("utf-8")
-    if all_games:
-        return jsonify(all_games)
-    return jsonify(error=404)
-
-#=========================================
+# =========================================
 
 
 @app.route('/login', methods=["POST", "GET"])
@@ -167,7 +241,8 @@ def signup():
         new_user_username = request.form.get('user_name')
         new_user_password = request.form.get('password')
         new_user_password_verification = request.form.get('password_two')
-        if not(new_user_first_name or new_user_last_name or new_user_login or new_user_password or new_user_password_verification):
+        if not (
+                new_user_first_name or new_user_last_name or new_user_login or new_user_password or new_user_password_verification):
             flash('Please, fill all the fields')
         elif new_user_password != new_user_password_verification:
             flash('Passwords not match')
@@ -176,10 +251,10 @@ def signup():
                 hash_password = generate_password_hash(new_user_password)
                 new_user = models.Customers(customer_first_name=new_user_first_name,
                                             customer_last_name=new_user_last_name,
-                                            customer_username = new_user_username,
+                                            customer_username=new_user_username,
                                             customer_email=new_user_login,
                                             customer_password=hash_password,
-                                            role=models.Roles.get(1))
+                                            role=models.Roles.query.get(2))
                 db.session.add(new_user)
                 db.session.commit()
                 session['customer_first_name'] = new_user.customer_first_name
@@ -201,6 +276,7 @@ def logout():
 @app.route('/edit_profile', methods=["GET", "POST"])
 @login_required
 def edit_profile():
+    g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
     if request.method == "POST":
         new_first_name = request.form.get('new_first_name')
         new_last_name = request.form.get('new_last_name')
@@ -217,7 +293,7 @@ def edit_profile():
         return redirect(url_for('display_all_games'))
     return render_template('user_profile.html',
                            customer=current_user,
-                           user_photo=base64.b64encode(current_user.customer_photo).decode("utf-8"))
+                           user_photo=g.photo)
 
 
 @manager.user_loader
@@ -239,7 +315,7 @@ def load_users():
         try:
             g.user = current_user.get_id()
             g.admin_perm = current_user.role.name
-            g.photo = base64.b64encode(current_user.customer_photo).decode("utf-8")
+            g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
         except AttributeError:
             g.user = None
             g.admin_perm = None

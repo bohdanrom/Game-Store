@@ -148,16 +148,6 @@ header, footer{
 .genre{
     margin-right: 10px;
 }
-.genre_text{
-    color: rgba(255,255,255,0.85);
-    font-size: 18px;
-    font-weight: bold;
-    background: #5097f3;
-    border-radius: 20px;
-    padding: 4px 15px;
-    text-align: center;
-    display: inline-block;
-}
 .game_platforms{
     margin-left: 50px;
     margin-top: 15px;
@@ -215,7 +205,8 @@ header, footer{
 }
 .game_ico{
     max-width: 100%;
-    height: auto;
+    height: 170px;
+    width: 300px;
     border-radius: 10px;
 }
 .game-price{
@@ -544,4 +535,81 @@ header, footer{
 .edit_profile{
     text-align: center;
     margin: 32px auto;
+}
+.comments{
+    margin: 40px auto 0 auto;
+    width: 93%;
+    border-radius: 5px;
+    border: none;
+}
+.user_comment{
+    margin: 10px auto;
+    width: 95%;
+}
+.comment_author{
+    position: relative;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+.comment_author_image{
+    display: flex;
+}
+.comment_owner{
+    margin-top: 1.33%;
+    color: #ffffff;
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 18px;
+}
+.comment_div{
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+.comment{
+    resize: none;
+    outline: none;
+    background: #d3d3d3;
+    border: none;
+    border-radius: 5px;
+    width: 400px;
+}
+.reply{
+    color: #11337C;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 20px;
+    text-decoration: underline;
+}
+.comment_text{
+    color: #ffffff;
+    width: 700px;
+    word-wrap: break-word;
+}
+.add_comment{
+    display: flex;
+    margin-bottom: 20px;
+}
+.add_comment_input{
+    background: #11337C;
+    border: none;
+    border-radius: 3px;
+    font-weight: bold;
+    color: #ffffff;
+    padding: 10px 15px;
+    margin-left: 10px;
+}
+.customer_comments{
+    display: flex;
+    margin: 0 auto;
+}
+div.sub{
+    margin-left: 30px;
+}
+.all_comments{
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }

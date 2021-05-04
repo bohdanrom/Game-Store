@@ -95,7 +95,7 @@ def load_user(customer_id):
 class Comments(db.Model):
     __tablename__ = 'comments'
     comment_id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.Text)
+    text = db.Column(db.String(256))
     game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'))
     author_username = db.Column(db.String(64), db.ForeignKey('customers.customer_username'))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow, index=True)

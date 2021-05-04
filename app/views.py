@@ -75,7 +75,7 @@ def add_new_game():
     return render_template('add_game.html', user_photo=g.photo, genres=return_genres())
 
 
-@app.route('/<int:game_id>', methods=["GET", "POST"])
+@app.route('/<int:game_id>', methods=["GET", "POST", "DELETE"])
 def display_game(game_id: int):
     game_details = models.Games.query.filter_by(game_id=game_id).first()
     if game_details.is_active:
@@ -86,14 +86,25 @@ def display_game(game_id: int):
                     new_comment = models.Comments(text=comment, game_id=game_id,
                                                   author_username=current_user.customer_username,
                                                   parent_id=int(request.form.get('parent')))
+                elif request.form.get('edit'):
+                    comment_id = int(request.form.get('edit'))
+                    comment_object = models.Comments.query.filter_by(comment_id=comment_id).first()
+                    comment_object.text = comment
+                    db.session.commit()
+                    return redirect(request.url)
                 else:
                     new_comment = models.Comments(text=comment, game_id=game_id,
                                                   author_username=current_user.customer_username)
                 db.session.add(new_comment)
                 db.session.commit()
                 return redirect(request.url)
+        elif request.method == "DELETE":
+            comment_id = request.json
+            print(comment_id)
+            # comment = models.Comments.query.get(int(comment_id))
+            # db.session.delete(comment)
+            # db.session.commit()
         game_photo = models.GameImages.query.filter_by(game_id=game_id).first()
-        print(game_photo)
         game_comments = models.Comments.query.filter_by(game_id=game_id).order_by(models.Comments.comment_id).all()
         game_sub_comments = models.Comments.query.filter_by(game_id=game_id).filter(
             models.Comments.parent_id != None).order_by(models.Comments.comment_id).all()

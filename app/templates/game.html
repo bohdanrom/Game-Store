@@ -2,97 +2,132 @@
 {% block title %}{{game_details.game_name}}{% endblock %}
 {% block content %}
 <div class="row">
-        <div class="about_game">
-                <div class="row">
-                        <div class="about_game">
-                                <img src="data:image/jpeg;base64,{{ game_image }}" alt="game_img" class="game_photo">
-                        </div>
-                </div>
-                <div class="row">
-                        <div class="name_price_buy-button">
-                                <div class="name_and_price">
-                                        <h1 class="game_name">{{game_details.game_name}}</h1>
-                                        <p class="price">{{game_details.price}}$</p>
-                                </div>
-                                <div class="button">
-                                        <a href="#" class="buy_button">BUY</a>
-                                </div>
-                        </div>
-                </div>
-                <div class="row">
-                        <hr color="#d3d3d3" align="center" size="5" width="90%">
-                </div>
-                <div class="row">
-                        <div class="game_genres">
-                                {% for genre in game_details.genres %}
-                                        <div class="genre">
-                                                <a href="#" class="genre_text">{{ genre.game_type_name }}</a>
-                                        </div>
-                                {% endfor %}
-                        </div>
-                </div>
-                <div class="row">
-                        <div class="game_platforms">
-                                {% for ico in platforms_ico %}
-                                        <a href="#" class="platform">
-                                                <img src="data:image/jpeg;base64,{{ ico }}" height="60" alt="my_img" class="platform_ico">
-                                        </a>
-                                {% endfor %}
-                        </div>
-                </div>
-                <div class="row">
-                        <div class="game_description">
-                                <p class="game_description_text">{{game_details.game_description}}</p>
-                        </div>
-                </div>
-                <div class="comments">
-                        <div class="all_comments">
-                                {% for comment, ico in game_comments|zip(comment_authors_images) %}
-                                        {% if not comment.parent_id %}
-                                                <div class="user_comment">
-                                                        <div class="comment_author_image">
-                                                                <img src="data:image/jpeg;base64, {{ ico }}" alt="comment_author_ico" height="50" class="comment_author">
-                                                                <p class="comment_owner">{{ comment.author_username }}</p>
-                                                        </div>
-                                                        <div class="comment_div">
-                                                                <p class="comment_text">{{ comment.text }}</p>
-                                                                {% if not comment.parent_id %}
-                                                                        <p onclick="parentReply({{ comment.comment_id }})" class="reply">Reply</p>
-                                                                        {% for sub_comment, sub_ico in game_sub_comments|zip(sub_comment_authors_images) %}
-                                                                                {% if sub_comment.parent_id == comment.comment_id %}
-                                                                                        <div class="sub comment_div">
-                                                                                                <div class="sub comment_author_image">
-                                                                                                        <img src="data:image/jpeg;base64, {{ sub_ico }}" alt="comment_author_ico" height="50" class="comment_author">
-                                                                                                        <p class="comment_owner">{{ sub_comment.author_username }}</p>
-                                                                                                </div>
-                                                                                                <div class="sub comment_div">
-                                                                                                        <p class="comment_text">{{ sub_comment.text }}</p>
-                                                                                                </div>
-                                                                                        </div>
-                                                                                {% endif %}
-                                                                        {% endfor %}
-                                                                {% endif %}
-                                                        </div>
-                                                </div>
-                                        {% endif %}
-                                {% endfor %}
-                        </div>
-                        <div class="add_comment">
-                                <form action="" method="post" class="customer_comments">
-                                        <input type="hidden" name='parent' id="parent_comment" class="parent_comment" value="">
-                                        <textarea class="comment" maxlength="256" name='comment' placeholder="What do you think about {{ game_details.game_name }}?"></textarea>
-                                        <input class="add_comment_input" type="submit" value="Add comment">
-                                </form>
-                        </div>
-{#                        <p style="color: #ffffff" class="release_date">{{game_details.release_date}}</p>#}
-{#                        <p style="color: #ffffff" class="number_of_players">{{game_details.number_of_players}}</p>#}
-{#                        <p style="color: #ffffff" class="quantity_available">{{game_details.quantity_available}}</p>#}
-                </div>
+    <div class="about_game">
+        <div class="row">
+            <div class="about_game">
+                <img src="data:image/jpeg;base64,{{ game_image }}" alt="game_img" class="game_photo">
+            </div>
         </div>
+        <div class="row">
+            <div class="name_price_buy-button">
+                <div class="name_and_price">
+                    <h1 class="game_name">{{game_details.game_name}}</h1>
+                    <p class="price">{{game_details.price}}$</p>
+                </div>
+                <div class="button">
+                    <a href="#" class="buy_button">BUY</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <hr color="#d3d3d3" align="center" size="5" width="90%">
+        </div>
+        <div class="row">
+            <div class="game_genres">
+                {% for genre in game_details.genres %}
+                <div class="genre">
+                    <a href="#" class="genre_text">{{ genre.game_type_name }}</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="game_platforms">
+                {% for ico in platforms_ico %}
+                <a href="#" class="platform">
+                    <img src="data:image/jpeg;base64,{{ ico }}" height="60" alt="my_img" class="platform_ico">
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="game_description">
+                <p class="game_description_text">{{game_details.game_description}}</p>
+            </div>
+        </div>
+        <div class="comments">
+            <div class="all_comments">
+                {% for comment, ico in game_comments|zip(comment_authors_images) %}
+                {% if not comment.parent_id %}
+                <div class="user_comment">
+                    <div class="comment_author_image">
+                        <img src="data:image/jpeg;base64, {{ ico }}" alt="comment_author_ico" height="50" class="comment_author">
+                        <p class="comment_owner">{{ comment.author_username }}</p>
+                    </div>
+                    <div class="comment_div">
+                        <p class="comment_text">{{ comment.text }}</p>
+                        {% if not comment.parent_id %}
+                        {% if current_user.is_authenticated %}
+                        <div class="crud_comments">
+                            <p onclick="parentReply({{ comment.comment_id }})" class="reply">Reply</p>
+                            {% if current_user.customer_username == comment.author_username %}
+                            <p class="reply edit_comment" onclick="editComment(`{{ comment.text }}`, {{ comment.comment_id }})">Edit</p>
+                            <p class="reply delete_comment" onclick="deleteComment({{ comment.comment_id }})">Delete</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% for sub_comment, sub_ico in game_sub_comments|zip(sub_comment_authors_images) %}
+                        {% if sub_comment.parent_id == comment.comment_id %}
+                        <div class="sub comment_div">
+                            <div class="sub comment_author_image">
+                                <img src="data:image/jpeg;base64, {{ sub_ico }}" alt="comment_author_ico" height="50" class="comment_author">
+                                <p class="comment_owner">{{ sub_comment.author_username }}</p>
+                            </div>
+                            <div class="sub comment_div">
+                                <p class="comment_text">{{ sub_comment.text }}</p>
+                                {% if current_user.customer_username == sub_comment.author_username %}
+                                <div class="crud_comments">
+                                    <p onclick="editComment(`{{ sub_comment.text }}`, {{ sub_comment.comment_id }})" class="reply edit_comment">Edit</p>
+                                    <p onclick="deleteComment({{ sub_comment.comment_id, sub_comment.parent_id }})" class="reply delete_comment">Delete</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% if current_user.is_authenticated %}
+            <div class="add_comment">
+                <form action="" method="post" class="customer_comments">
+                    <input type="hidden" name='parent' id="parent_comment" class="parent_comment" value="">
+                    <input type="hidden" name='edit' id="edit_comment" class="parent_comment" value="">
+                    <textarea id="comment" class="comment" maxlength="256" name='comment' placeholder="What do you think about {{ game_details.game_name }}?"></textarea>
+                    <input class="add_comment_input" type="submit" value="Add comment">
+                </form>
+            </div>
+            {% endif %}
+            {#                        <p style="color: #ffffff" class="release_date">{{game_details.release_date}}</p>#}
+            {#                        <p style="color: #ffffff" class="number_of_players">{{game_details.number_of_players}}</p>#}
+            {#                        <p style="color: #ffffff" class="quantity_available">{{game_details.quantity_available}}</p>#}
+        </div>
+    </div>
 </div>
 <script>
         function parentReply(commentId){
             document.getElementById('parent_comment').value = commentId;
         }
+</script>
+<script>
+        function editComment(commentText, commentId){
+            document.getElementById("comment").value = commentText;
+            document.getElementById("edit_comment").value = commentId;
+        }
+</script>
+<script>
+        function deleteComment(commentId, parentId=NaN){
+            $.ajax({
+                url: '{{url_for('display_game', game_id=game_details.game_id)}}',
+                type: 'delete',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: {commentId:String(commentId),
+                        parentId: String(parentId)},
+            })
+        };
 </script>
 {% endblock %}

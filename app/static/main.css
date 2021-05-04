@@ -581,6 +581,8 @@ header, footer{
     margin-top: 10px;
     font-weight: bold;
     font-size: 20px;
+}
+.reply:hover{
     text-decoration: underline;
 }
 .comment_text{
@@ -612,4 +614,10 @@ div.sub{
     height: 400px;
     overflow-y: auto;
     overflow-x: hidden;
+}
+.crud_comments{
+    display: flex;
+}
+.crud_comments>p{
+    margin-right: 5px;
 }

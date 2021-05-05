@@ -73,9 +73,13 @@
                 {% for data, photo in all_games|zip(game_images) %}
                         <div class="overlay">
                                 <div class="game_photo_div" game_id="{{ data.game_id }}">
+                                        {% if login == 'Admin' %}
+                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} './static/mark.jpg' {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
+                                        {% else %}
                                         <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
-                                                <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} './static/mark.jpg' {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
+                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} './static/mark.jpg' {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
                                         </a>
+                                        {% endif %}
                                         {% if login == 'Admin' %}
                                                 <div class="admin_overlay">
                                                         <a href="{{ url_for('edit_game', game_id=data.game_id) }}" class="admin_img"><img src="./static/white_pencil.png" alt="" height="60" class="hover_img"></a>

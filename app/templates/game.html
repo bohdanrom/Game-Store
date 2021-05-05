@@ -51,8 +51,13 @@
                 {% if not comment.parent_id %}
                 <div class="user_comment">
                     <div class="comment_author_image">
-                        <img src="data:image/jpeg;base64, {{ ico }}" alt="comment_author_ico" height="50" class="comment_author">
-                        <p class="comment_owner">{{ comment.author_username }}</p>
+                        <div class="author_and_image">
+                            <img src="data:image/jpeg;base64, {{ ico }}" alt="comment_author_ico" height="50" class="comment_author">
+                            <p class="comment_owner">{{ comment.author_username }}</p>
+                        </div>
+                        <div class="date" style="color: #ffffff">
+                            <p class="publication_date">{{ comment.timestamp.strftime("%b %d %Y %H:%M") }}</p>
+                        </div>
                     </div>
                     <div class="comment_div">
                         <p class="comment_text">{{ comment.text }}</p>
@@ -60,7 +65,7 @@
                         {% if current_user.is_authenticated %}
                         <div class="crud_comments">
                             <p onclick="parentReply({{ comment.comment_id }})" class="reply">Reply</p>
-                            {% if current_user.customer_username == comment.author_username %}
+                            {% if ((current_user.customer_username == comment.author_username) or (login == "Admin")) %}
                             <p class="reply edit_comment" onclick="editComment(`{{ comment.text }}`, {{ comment.comment_id }})">Edit</p>
                             <p class="reply delete_comment" onclick="deleteComment({{ comment.comment_id }})">Delete</p>
                             {% endif %}
@@ -69,16 +74,21 @@
                         {% for sub_comment, sub_ico in game_sub_comments|zip(sub_comment_authors_images) %}
                         {% if sub_comment.parent_id == comment.comment_id %}
                         <div class="sub comment_div">
-                            <div class="sub comment_author_image">
-                                <img src="data:image/jpeg;base64, {{ sub_ico }}" alt="comment_author_ico" height="50" class="comment_author">
-                                <p class="comment_owner">{{ sub_comment.author_username }}</p>
+                            <div class="comment_author_image">
+                                <div class="author_and_image">
+                                    <img src="data:image/jpeg;base64, {{ sub_ico }}" alt="comment_author_ico" height="50" class="comment_author">
+                                    <p class="comment_owner">{{ sub_comment.author_username }}</p>
+                                </div>
+                                <div class="date" style="color: #ffffff">
+                                    <p class="publication_date">{{ sub_comment.timestamp.strftime("%b %d %Y %H:%M") }}</p>
+                                </div>
                             </div>
                             <div class="sub comment_div">
                                 <p class="comment_text">{{ sub_comment.text }}</p>
-                                {% if current_user.customer_username == sub_comment.author_username %}
+                                {% if ((current_user.customer_username == sub_comment.author_username) or (login == "Admin")) %}
                                 <div class="crud_comments">
                                     <p onclick="editComment(`{{ sub_comment.text }}`, {{ sub_comment.comment_id }})" class="reply edit_comment">Edit</p>
-                                    <p onclick="deleteComment({{ sub_comment.comment_id, sub_comment.parent_id }})" class="reply delete_comment">Delete</p>
+                                    <p onclick="deleteComment({{ sub_comment.comment_id }})" class="reply delete_comment">Delete</p>
                                 </div>
                                 {% endif %}
                             </div>
@@ -91,7 +101,7 @@
                 {% endif %}
                 {% endfor %}
             </div>
-            {% if current_user.is_authenticated %}
+            {% if current_user.is_authenticated or login == "Admin"%}
             <div class="add_comment">
                 <form action="" method="post" class="customer_comments">
                     <input type="hidden" name='parent' id="parent_comment" class="parent_comment" value="">
@@ -101,9 +111,9 @@
                 </form>
             </div>
             {% endif %}
-            {#                        <p style="color: #ffffff" class="release_date">{{game_details.release_date}}</p>#}
-            {#                        <p style="color: #ffffff" class="number_of_players">{{game_details.number_of_players}}</p>#}
-            {#                        <p style="color: #ffffff" class="quantity_available">{{game_details.quantity_available}}</p>#}
+                <!--<p style="color: #ffffff" class="release_date">{{game_details.release_date}}</p>-->
+                <!--<p style="color: #ffffff" class="number_of_players">{{game_details.number_of_players}}</p>-->
+                <!--<p style="color: #ffffff" class="quantity_available">{{game_details.quantity_available}}</p>-->
         </div>
     </div>
 </div>
@@ -119,15 +129,18 @@
         }
 </script>
 <script>
-        function deleteComment(commentId, parentId=NaN){
+        function deleteComment(commentId){
             $.ajax({
-                url: '{{url_for('display_game', game_id=game_details.game_id)}}',
-                type: 'delete',
+                url: '{{ url_for('delete_comment') }}',
+                type: 'post',
                 dataType: 'json',
                 contentType: 'application/json',
-                data: {commentId:String(commentId),
-                        parentId: String(parentId)},
-            })
+                data: String(commentId),
+                
+            });
+            $(document).ajaxStop(function(){
+                window.location.reload();
+            });
         };
 </script>
 {% endblock %}

@@ -1,4 +1,5 @@
 import base64
+import datetime
 
 from flask import render_template, request, redirect, flash, url_for, session, g
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -75,7 +76,18 @@ def add_new_game():
     return render_template('add_game.html', user_photo=g.photo, genres=return_genres())
 
 
-@app.route('/<int:game_id>', methods=["GET", "POST", "DELETE"])
+@app.route('/delete_comment', methods=["POST"])
+@login_required
+def delete_comment():
+    comment_id = request.json
+    comment = models.Comments.query.get(int(comment_id))
+    if comment.author_username == current_user.customer_username or admin_permission() == "Admin":
+        db.session.delete(comment)
+        db.session.commit()
+    return "Ok"
+
+
+@app.route('/<int:game_id>', methods=["GET", "POST"])
 def display_game(game_id: int):
     game_details = models.Games.query.filter_by(game_id=game_id).first()
     if game_details.is_active:
@@ -90,6 +102,7 @@ def display_game(game_id: int):
                     comment_id = int(request.form.get('edit'))
                     comment_object = models.Comments.query.filter_by(comment_id=comment_id).first()
                     comment_object.text = comment
+                    comment_object.timestamp = datetime.datetime.utcnow()
                     db.session.commit()
                     return redirect(request.url)
                 else:
@@ -98,12 +111,6 @@ def display_game(game_id: int):
                 db.session.add(new_comment)
                 db.session.commit()
                 return redirect(request.url)
-        elif request.method == "DELETE":
-            comment_id = request.json
-            print(comment_id)
-            # comment = models.Comments.query.get(int(comment_id))
-            # db.session.delete(comment)
-            # db.session.commit()
         game_photo = models.GameImages.query.filter_by(game_id=game_id).first()
         game_comments = models.Comments.query.filter_by(game_id=game_id).order_by(models.Comments.comment_id).all()
         game_sub_comments = models.Comments.query.filter_by(game_id=game_id).filter(
@@ -138,6 +145,7 @@ def display_game(game_id: int):
         return render_template("game.html",
                                game_details=game_details,
                                game_image=game_image,
+                               login=g.admin_perm,
                                game_comments=game_comments,
                                game_sub_comments=game_sub_comments,
                                comment_authors_images=comment_authors_images,
@@ -200,7 +208,6 @@ def hide_game():
 
 @app.route('/')
 def display_all_games():
-    # print(current_user.customer_username)
     if 'User' in admin_permission():
         all_games = models.Games.query.order_by(models.Games.game_id).filter_by(is_active=True).all()
     else:
@@ -306,6 +313,18 @@ def edit_profile():
                            customer=current_user,
                            user_photo=g.photo)
 
+
+@app.route('/order', methods=["POST", "GET"])
+def order():
+    if request.method == "POST":
+        order_first_name = request.form.get("order_first_name")
+        order_last_name = request.form.get("order_last_name")
+        order_email = request.form.get("order_email")
+        order_phone = request.form.get("order_phone")
+        payment_type = request.form.get("payment_type")
+        comment = request.form.get("Comment")
+        print(order_first_name, order_last_name, order_email, order_phone, payment_type, comment)
+    return render_template('cart.html')
 
 @manager.user_loader
 def load_user(customer_id):

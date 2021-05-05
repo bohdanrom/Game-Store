@@ -11,8 +11,6 @@
         <meta name="author" content="Bohdan Romanytsia">
         <link rel="icon" type="image/png" href="./static/ri2759.ico">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='slick.css') }}"/>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='slick-theme.css') }}"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
         <title>{% block title %}{% endblock %}</title>
@@ -97,7 +95,7 @@
                                                         <input type="password" placeholder="Password" name="user_password" class="input">
                                                         <input type="submit" value="Welcome Home" name="sab" class="input submit">
                                                 </form>
-                                                <a href="#" onclick="signUp(state='none', state_two='block')" class="login_ref"><p>Still haven't an account?</p></a>
+                                                <a href="#" onclick="signUp(state='none', state_two='block')" class="login_ref">Still haven't an account?</a>
                                         </div>
                                          <div class="reg_form_new" id="reg_form_new">
                                                 <h2>Sign Up</h2>
@@ -110,16 +108,16 @@
                                                         <input type="password" placeholder="Confirm Password" name="password_two" class="input">
                                                         <input type="submit" value="Join Family" name="sab" class="input submit">
                                                 </form>
-                                                <a href="#" onclick="signUp(state='block', state_two='none')" class="login_ref"><p>Already a member?</p></a>
+                                                <a href="#" onclick="signUp(state='block', state_two='none')" class="login_ref">Already a member?</a>
                                         </div>
                         </div>
                 </div>
 		        <div class="container">
-                        {%- for category, message in get_flashed_messages(with_categories = true) %}
-                                <div class = "alert">
-                                        {{ message }}
-                                </div>
-                        {%- endfor %}
+<!--                        {%- for category, message in get_flashed_messages(with_categories = true) %}-->
+<!--                                <div class = "alert">-->
+<!--                                        {{ message }}-->
+<!--                                </div>-->
+<!--                        {%- endfor %}-->
 			            {% block content%}
 			            {% endblock %}
 		        </div>

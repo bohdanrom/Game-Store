@@ -555,9 +555,13 @@ header, footer{
 }
 .comment_author_image{
     display: flex;
+    justify-content: space-between;
+}
+.author_and_image{
+    display: flex;
 }
 .comment_owner{
-    margin-top: 1.33%;
+    margin-top: 12%;
     color: #ffffff;
     margin-left: 10px;
     font-weight: bold;
@@ -620,4 +624,46 @@ div.sub{
 }
 .crud_comments>p{
     margin-right: 5px;
+}
+.date{
+    margin-left:50px;
+}
+.order{
+    display: flex;
+    margin: 30px auto;
+    width: 90%;
+    justify-content: space-between;
+    margin: 0 auto;
+}
+.order_label{
+    color: #ffffff;
+    margin-bottom: 0;
+}
+.order_form{
+    margin: 0 auto;
+}
+.order_input{
+    color: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 3px;
+    padding-left: 2px;
+    width: 400px;
+    height: 50px;
+    margin-bottom: 25px;
+    color: #000000;
+}
+.field {
+    display: flex;
+    flex-flow: column-reverse;
+}
+.order_button{
+    display: flex;
+}
+.order_button>input{
+    margin: 18px auto 19px auto;
+}
+.field>textarea{
+    resize: none;
+    height: 155px;
+    margin-bottom: 0;
 }

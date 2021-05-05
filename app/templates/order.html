@@ -1,0 +1,43 @@
+{% extends 'index.html' %}
+{% block title %}
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="order">
+            <form class="order_form" method="post" action="">
+                <div class="field">
+                    <input type="text" id="order_first_name" class="order_input" name="order_first_name">
+                    <label class="order_label" for="order_first_name">First Name</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="order_last_name" class="order_input" name="order_last_name">
+                    <label class="order_label" for="order_last_name">Last Name</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="order_email" class="order_input" name="order_email">
+                    <label class="order_label" for="order_email">Email</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="order_phone" class="order_input" name="order_phone">
+                    <label class="order_label" for="order_phone">Phone</label>
+                </div>
+                <div class="field">
+                <select name="payment_type" id="payment_type" class="order_input">
+                    <option value="Credit card">Credit card</option>
+                    <option value="Cash">Cash</option>
+                </select>
+                <label class="order_label" for="payment_type">Payment type</label>
+                </div>
+                <div class="field">
+                    <textarea name="comment" class="order_input" id="order_input"></textarea>
+                    <label class="order_label" for="payment_type">Comments(optional)</label>
+                </div>
+                <div class="order_button">
+                    <input type="submit"  class="submit input" value="Order">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

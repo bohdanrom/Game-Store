@@ -38,7 +38,7 @@ header, footer{
 .main{
     background: #1e1e1e;
     padding-top: 14px;
-    box-sizing: border-box;
+    height: auto;
 }
 .nav-link{
     font-size: 22px;
@@ -86,7 +86,6 @@ header, footer{
 }
 .game_photo{
     max-width: 100%;
-    height: auto;
     width: 90%;
     margin-left: auto;
     margin-right: auto;
@@ -133,6 +132,7 @@ header, footer{
 }
 .game_description_text{
     color: #ffffff;
+    width: 96%;
 }
 .about_game{
     margin: 0 auto;
@@ -164,7 +164,7 @@ header, footer{
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: right;
-    height: 699px;
+    height: 645px;
     overflow-y:auto;
 }
 ::-webkit-scrollbar{
@@ -731,4 +731,85 @@ div.sub{
     max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.cart{
+    color: #ffffff;
+    margin: 0 auto;
+    display: block;
+    width: 90%;
+}
+.cart_item_image{
+    padding: 10px;
+    width: 140px;
+    height: 140px;
+    margin-right: 5px;
+}
+.add_minus_amount{
+    display: flex;
+    font-size: 18px;
+    text-align: center;
+    width: 150px;
+}
+.minus{
+    background: #169c3f;
+    cursor: pointer;
+    border-radius: 50% 0 0 50%;
+}
+.plus{
+    background: #169c3f;
+    cursor: pointer;
+    border-radius: 0 50% 50% 0;
+}
+.amount{
+    background: #169c3f;
+}
+.add_minus_amount>p{
+    padding: 10px 20px;
+}
+.delete_game_from_cart_ico{
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+table{
+    width: 91%;
+    overflow-y: auto;
+}
+td{
+    padding: 0;
+}
+.cart_game_image{
+    width: 10%;
+}
+.cart_element{
+    border: 2px solid #000000;
+}
+.proceed{
+    padding: 10% 30%;
+    background: #169c3f;
+    border-radius: 3%;
+    font-size: 18px;
+}
+.cart_header{
+    display: flex;
+    width: 87%;
+    margin: 30px 0 30px 0;
+}
+.your_cart{
+    font-weight: bold;
+    font-size: 40px;
+}
+.price_div{
+    font-weight: bold;
+    font-size: 40px;
+    display: flex;
+}
+.total_price_header{
+    margin-left: 60%;
+}
+.price_and_dollar{
+    display: flex;
+}
+.table_cart{
+    height: 598px;
 }

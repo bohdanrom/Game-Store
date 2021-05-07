@@ -8,42 +8,32 @@
                 <img src="data:image/jpeg;base64,{{ game_image }}" alt="game_img" class="game_photo">
             </div>
         </div>
-        <div class="row">
-            <div class="name_price_buy-button">
-                <div class="name_and_price">
-                    <h1 class="game_name">{{game_details.game_name}}</h1>
-                    <p class="price">{{game_details.price}}$</p>
-                </div>
-                <div class="button">
-                    <a href="#" class="buy_button">BUY</a>
-                </div>
+        <div class="name_price_buy-button">
+            <div class="name_and_price">
+                <h1 class="game_name">{{game_details.game_name}}</h1>
+                <p class="price">{{game_details.price}}$</p>
+            </div>
+            <div class="button">
+                <button class="buy_button">BUY</button>
             </div>
         </div>
-        <div class="row">
             <hr color="#d3d3d3" align="center" size="5" width="90%">
+        <div class="game_genres">
+            {% for genre in game_details.genres %}
+                <div class="genre">
+                    <a href="#" class="genre_text">{{ genre.game_type_name }}</a>
+                </div>
+            {% endfor %}
         </div>
-        <div class="row">
-            <div class="game_genres">
-                {% for genre in game_details.genres %}
-                    <div class="genre">
-                        <a href="#" class="genre_text">{{ genre.game_type_name }}</a>
-                    </div>
-                {% endfor %}
-            </div>
+        <div class="game_platforms">
+            {% for ico in platforms_ico %}
+                <a href="#" class="platform">
+                    <img src="data:image/jpeg;base64,{{ ico }}" height="60" alt="my_img" class="platform_ico">
+                </a>
+            {% endfor %}
         </div>
-        <div class="row">
-            <div class="game_platforms">
-                {% for ico in platforms_ico %}
-                    <a href="#" class="platform">
-                        <img src="data:image/jpeg;base64,{{ ico }}" height="60" alt="my_img" class="platform_ico">
-                    </a>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="game_description">
-                <p class="game_description_text">{{game_details.game_description}}</p>
-            </div>
+        <div class="game_description">
+            <p class="game_description_text">{{game_details.game_description}}</p>
         </div>
         <div class="comments">
             <div class="all_comments">
@@ -129,11 +119,7 @@
                     </div>
                 </div>
             {% endif %}
-                <!--<p style="color: #ffffff" class="release_date">{{game_details.release_date}}</p>-->
-                <!--<p style="color: #ffffff" class="number_of_players">{{game_details.number_of_players}}</p>-->
-                <!--<p style="color: #ffffff" class="quantity_available">{{game_details.quantity_available}}</p>-->
         </div>
-    </div>
 </div>
 <script>
     function closeReply(){

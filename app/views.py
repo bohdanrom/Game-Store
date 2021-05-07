@@ -327,6 +327,18 @@ def order():
     return render_template('order.html', user_photo=g.photo)
 
 
+@app.route('/cart', methods=["POST", "GET"])
+def cart():
+    user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date).first()
+    print(user_cart)
+    cart_items = models.CartItem.query.filter_by(cart_id=1).all()
+    cart_items_images = [convert_image_from_binary_to_unicode(models.GameImages.query.filter_by(game_id=elem.game_id).first().game_photo) for elem in cart_items]
+    game_details = [models.Games.query.get(item.game_id) for item in cart_items]
+    if request.method == "POST":
+        pass
+    return render_template('cart.html', cart_items=cart_items, cart_items_images=cart_items_images, game_details=game_details, user_photo=g.photo)
+
+
 @manager.user_loader
 def load_user(customer_id):
     if customer_id is not None:

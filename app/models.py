@@ -103,3 +103,35 @@ class Comments(db.Model):
     replies = db.relationship('Comments', backref=db.backref('comments', remote_side=[comment_id]), lazy='dynamic', passive_deletes=True)
     author = db.relationship("Customers", backref=db.backref('customers'), uselist=False)
     game = db.relationship("Games", backref=db.backref('game'), uselist=False)
+
+
+class Cart(db.Model):
+    __tablename__ = 'cart'
+    cart_id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.customer_id'))
+    total_price = db.Column(db.Float)
+    date = db.Column(db.DateTime(), default=datetime.utcnow)
+    customer = db.relationship("Customers", backref=db.backref('customer'), uselist=False)
+
+
+class Orders(db.Model):
+    __tablename__ = 'orders'
+    order_id = db.Column(db.Integer, primary_key=True)
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id'))
+    customer_first_name = db.Column(db.String(30))
+    customer_last_name = db.Column(db.String(30))
+    customer_email = db.Column(db.String(128), nullable=False)
+    customer_phone = db.Column(db.String(20))
+    payment_type = db.Column(db.String(64))
+    comment = db.Column(db.String(256))
+    cart = db.relationship("Cart", backref=db.backref('cart'), uselist=False)
+
+
+class CartItem(db.Model):
+    __tablename__ = 'cart_item'
+    cart_item_id = db.Column(db.Integer, primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey("games.game_id"))
+    amount = db.Column(db.Integer)
+    price = db.Column(db.Float)
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id'))
+    game_item = db.relationship("Games", backref=db.backref('game_item'), uselist=False)

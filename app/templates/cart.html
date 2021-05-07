@@ -1,44 +1,73 @@
 {% extends 'index.html' %}
 {% block title %}
 {% endblock %}
-<div class="container">
-    <div class="row">
-        <div class="cart">
-            <div class="cart_header">
+{% block content %}
+<div class="row">
+    <div class="cart">
+        <div class="cart_header">
+            <div class="your_cart">
                 <p class="your_cart">Your cart</p>
-                <p class="total">Total:</p>
-                <p class="total_price"></p>
-                <a href="#" class="proceed"></a>
             </div>
-            <div class="all_games">
-                
-                <div class="cart_element">
-                    <div class="cart_game_image">
-                        <img src="" alt="">
-                    </div>
-                    <div class="cart_game_name_and_price">
-                        <h2>
-                        </h2>
-                        <p>
-                        </p>
-                    </div>
-                    <div class="cart_game_amount">
-                        <p>
-                        </p>
-                    </div>
-                    <div class="cart_game_total_price">
-                        </p>
-                        </p>
-                        </p>
-                        </p>
-                    </div>
-                    <div class="cart_game_cancel">
-                        <img src="{{ url_for('static', filename='')}}" alt="delete_game_from_cart_ico">
-                    </div>
+            <div class="total_price_header">
+                <div class="price_div">
+                    <p class="total">Total:</p>
+                    <p class="total_price" id="total"></p>
+                </div>
+                <div class="proceed_button">
+                    <a href="{{ url_for('order')}}" class="proceed">Proceed</a>
                 </div>
             </div>
         </div>
+        <div class="table_cart">
+            <table>
+                <tbody>
+                    {% if cart_items%}
+                        {% for cart_item, cart_item_image, game_detail in cart_items|zip(cart_items_images, game_details) %}
+                        <tr class="cart_element">
+                            <td class="cart_game_image">
+                                <a href="{{ url_for('display_game', game_id=cart_item.game_id)}}">
+                                    <img src="data:image/jpeg;base64, {{ cart_item_image }}" alt="cart_item_image" class="cart_item_image">
+                                </a>
+                            </td>
+                            <td class="cart_game_name_and_price">
+                                <h3 class="cart_game_name">{{ game_detail.game_name }}</h3>
+                                <div class="price_and_dollar">
+                                    <p id="standart_price{{ game_detail.game_id }}">{{ game_detail.price }}</p>
+                                    <p>$</p>
+                                </div>
+                            </td>
+                            <td class="cart_game_amount">
+                                <div class="add_minus_amount">
+                                    <p class="minus" id="minus" onclick="minusGame({{ cart_item.game_id }})">&ndash;</p> 
+                                    <p class="amount" id="amount{{ cart_item.game_id }}">{{ cart_item.amount }}</p>
+                                    <p class="plus" id="plus" onclick="addGame({{ cart_item.game_id }})">+</p>
+                                </div>
+                            </td>
+                            <td class="cart_game_total_price">
+                                <div class="total_price_for_one_cart_item">
+                                    <p>Total:</p>
+                                    <div class="price_and_dollar">
+                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{{ game_detail.price }}</p>
+                                        <p>$</p> 
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="cart_game_cancel">
+                                <img src="{{ url_for('static', filename='pngfind.com-3d-cross-png-6222696.png')}}" class="delete_game_from_cart_ico" alt="delete_game_from_cart_ico">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="20px"></td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align:center;">You have no products added in your Shopping Cart</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-{% block content %}
 {% endblock %}

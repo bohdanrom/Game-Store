@@ -301,7 +301,7 @@ header, footer{
 }
 .new_game_add_button{
     background: #20c579;
-    font-size: 1.125rem;
+    font-size: 14px;
     color: #ffffff;
     font-weight: bold;
     outline: none;
@@ -328,6 +328,7 @@ header, footer{
     position: relative;
     margin: 15px 0;
     text-align: center;
+    box-sizing: border-box;
 }
 .input__file {
     opacity: 0;
@@ -353,6 +354,7 @@ header, footer{
     line-height: 1;
     font-size: 0.9rem;
     margin: 1px auto;
+    padding-right: 1%;
 }
 .input__file-button {
     width: 100%;
@@ -596,7 +598,8 @@ header, footer{
 }
 .add_comment{
     display: flex;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    margin: 0 auto 20px auto;
 }
 .add_comment_input{
     background: #11337C;
@@ -630,7 +633,7 @@ div.sub{
 }
 .order{
     display: flex;
-    margin: 30px auto;
+    margin: 40px auto;
     width: 90%;
     justify-content: space-between;
     margin: 0 auto;
@@ -649,7 +652,7 @@ div.sub{
     padding-left: 2px;
     width: 400px;
     height: 50px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     color: #000000;
 }
 .field {
@@ -660,10 +663,72 @@ div.sub{
     display: flex;
 }
 .order_button>input{
-    margin: 18px auto 19px auto;
+    margin: 11px auto 15px auto;
+    border-radius: 10px;
+    font-weight: bold;
+    width: 150px;
+    color: #ffffff;
 }
 .field>textarea{
     resize: none;
     height: 155px;
     margin-bottom: 0;
+    outline: none;
+}
+.complete_order{
+    color: #ffffff;
+    margin-left: 4%;
+}
+.complete_order_h1{
+    font-size: 30px;
+}
+#payment_type{
+    outline: none;
+}
+.inner_modal{
+    display: flex;
+    justify-content: space-between;
+}
+.reply_img{
+    box-sizing: border-box;
+}
+.reply_img_picture{
+    height: 30px;
+    padding: 5px;
+}
+.input_and_hidden_field{
+    display: none;
+    background: rgb(30,30,30);
+    background: linear-gradient(45deg, rgba(30,30,30,0.8575805322128851) 13%, rgba(17,51,124,1) 45%, rgba(32,188,197,1) 94%);
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+.add_comment{
+    display: flex;
+    margin: 0 auto 20px auto;
+    justify-content: space-around;
+}
+.cancelReply{
+    margin-right: 15px;
+    padding-top: 5px;
+    cursor: pointer;
+}
+.reply_close{
+    box-sizing: border-box;
+}
+.reply_text_and_author{
+    display: flex;
+    color: #ffffff;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+.reply_text_and_author>p{
+    padding-top: 4px;
+    margin-right: 100px;
+}
+.comment_for_reply{
+    white-space: nowrap;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

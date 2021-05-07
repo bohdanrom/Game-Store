@@ -1,0 +1,44 @@
+{% extends 'index.html' %}
+{% block title %}
+{% endblock %}
+<div class="container">
+    <div class="row">
+        <div class="cart">
+            <div class="cart_header">
+                <p class="your_cart">Your cart</p>
+                <p class="total">Total:</p>
+                <p class="total_price"></p>
+                <a href="#" class="proceed"></a>
+            </div>
+            <div class="all_games">
+                
+                <div class="cart_element">
+                    <div class="cart_game_image">
+                        <img src="" alt="">
+                    </div>
+                    <div class="cart_game_name_and_price">
+                        <h2>
+                        </h2>
+                        <p>
+                        </p>
+                    </div>
+                    <div class="cart_game_amount">
+                        <p>
+                        </p>
+                    </div>
+                    <div class="cart_game_total_price">
+                        </p>
+                        </p>
+                        </p>
+                        </p>
+                    </div>
+                    <div class="cart_game_cancel">
+                        <img src="{{ url_for('static', filename='')}}" alt="delete_game_from_cart_ico">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block content %}
+{% endblock %}

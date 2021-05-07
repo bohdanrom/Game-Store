@@ -154,7 +154,7 @@ def display_game(game_id: int):
     return redirect('/')
 
 
-@app.route('/edit/<int:game_id>', methods=["GET", "POST"])
+@app.route('/<int:game_id>/edit', methods=["GET", "POST"])
 def edit_game(game_id: int):
     if 'User' in admin_permission():
         return redirect(f'/{game_id}')
@@ -324,7 +324,8 @@ def order():
         payment_type = request.form.get("payment_type")
         comment = request.form.get("Comment")
         print(order_first_name, order_last_name, order_email, order_phone, payment_type, comment)
-    return render_template('cart.html')
+    return render_template('order.html', user_photo=g.photo)
+
 
 @manager.user_loader
 def load_user(customer_id):

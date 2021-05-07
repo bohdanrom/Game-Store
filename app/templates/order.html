@@ -1,9 +1,13 @@
-{% extends 'index.html' %}
+{% extends "index.html" %}
 {% block title %}
+Order
 {% endblock %}
 {% block content %}
 <div class="container">
     <div class="row">
+        <div class="complete_order">
+            <h1 class="complete_order_h1">Completing your order</h1>
+        </div>
         <div class="order">
             <form class="order_form" method="post" action="">
                 <div class="field">
@@ -19,7 +23,7 @@
                     <label class="order_label" for="order_email">Email</label>
                 </div>
                 <div class="field">
-                    <input type="text" id="order_phone" class="order_input" name="order_phone">
+                    <input type="text" id="order_phone" class="order_input" name="order_phone" pattern=^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$>
                     <label class="order_label" for="order_phone">Phone</label>
                 </div>
                 <div class="field">

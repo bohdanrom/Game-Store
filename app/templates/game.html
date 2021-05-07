@@ -25,18 +25,18 @@
         <div class="row">
             <div class="game_genres">
                 {% for genre in game_details.genres %}
-                <div class="genre">
-                    <a href="#" class="genre_text">{{ genre.game_type_name }}</a>
-                </div>
+                    <div class="genre">
+                        <a href="#" class="genre_text">{{ genre.game_type_name }}</a>
+                    </div>
                 {% endfor %}
             </div>
         </div>
         <div class="row">
             <div class="game_platforms">
                 {% for ico in platforms_ico %}
-                <a href="#" class="platform">
-                    <img src="data:image/jpeg;base64,{{ ico }}" height="60" alt="my_img" class="platform_ico">
-                </a>
+                    <a href="#" class="platform">
+                        <img src="data:image/jpeg;base64,{{ ico }}" height="60" alt="my_img" class="platform_ico">
+                    </a>
                 {% endfor %}
             </div>
         </div>
@@ -48,68 +48,86 @@
         <div class="comments">
             <div class="all_comments">
                 {% for comment, ico in game_comments|zip(comment_authors_images) %}
-                {% if not comment.parent_id %}
-                <div class="user_comment">
-                    <div class="comment_author_image">
-                        <div class="author_and_image">
-                            <img src="data:image/jpeg;base64, {{ ico }}" alt="comment_author_ico" height="50" class="comment_author">
-                            <p class="comment_owner">{{ comment.author_username }}</p>
-                        </div>
-                        <div class="date" style="color: #ffffff">
-                            <p class="publication_date">{{ comment.timestamp.strftime("%b %d %Y %H:%M") }}</p>
-                        </div>
-                    </div>
-                    <div class="comment_div">
-                        <p class="comment_text">{{ comment.text }}</p>
-                        {% if not comment.parent_id %}
-                        {% if current_user.is_authenticated %}
-                        <div class="crud_comments">
-                            <p onclick="parentReply({{ comment.comment_id }})" class="reply">Reply</p>
-                            {% if ((current_user.customer_username == comment.author_username) or (login == "Admin")) %}
-                            <p class="reply edit_comment" onclick="editComment(`{{ comment.text }}`, {{ comment.comment_id }})">Edit</p>
-                            <p class="reply delete_comment" onclick="deleteComment({{ comment.comment_id }})">Delete</p>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-                        {% for sub_comment, sub_ico in game_sub_comments|zip(sub_comment_authors_images) %}
-                        {% if sub_comment.parent_id == comment.comment_id %}
-                        <div class="sub comment_div">
+                    {% if not comment.parent_id %}
+                        <div class="user_comment">
                             <div class="comment_author_image">
                                 <div class="author_and_image">
-                                    <img src="data:image/jpeg;base64, {{ sub_ico }}" alt="comment_author_ico" height="50" class="comment_author">
-                                    <p class="comment_owner">{{ sub_comment.author_username }}</p>
+                                    <img src="data:image/jpeg;base64, {{ ico }}" alt="comment_author_ico" height="50" class="comment_author">
+                                    <p class="comment_owner">{{ comment.author_username }}</p>
                                 </div>
                                 <div class="date" style="color: #ffffff">
-                                    <p class="publication_date">{{ sub_comment.timestamp.strftime("%b %d %Y %H:%M") }}</p>
+                                    <p class="publication_date">{{ comment.timestamp.strftime("%b %d %Y %H:%M") }}</p>
                                 </div>
                             </div>
-                            <div class="sub comment_div">
-                                <p class="comment_text">{{ sub_comment.text }}</p>
-                                {% if ((current_user.customer_username == sub_comment.author_username) or (login == "Admin")) %}
-                                <div class="crud_comments">
-                                    <p onclick="editComment(`{{ sub_comment.text }}`, {{ sub_comment.comment_id }})" class="reply edit_comment">Edit</p>
-                                    <p onclick="deleteComment({{ sub_comment.comment_id }})" class="reply delete_comment">Delete</p>
-                                </div>
+                            <div class="comment_div">
+                                <p class="comment_text" id="{{ comment.comment_id }}" >{{ comment.text }}</p>
+                                {% if not comment.parent_id %}
+                                    {% if current_user.is_authenticated %}
+                                        <div class="crud_comments">
+                                            <p onclick="parentReply(commentId={{ comment.comment_id }}, commentAuthor=`{{ comment.author_username }}`, commentText=`{{ comment.text }}`)" class="reply">Reply</p>
+                                            {% if ((current_user.customer_username == comment.author_username) or (login == "Admin")) %}
+                                                <p class="reply edit_comment" onclick="editComment(commentText=`{{ comment.text }}`, commentId={{ comment.comment_id }})">Edit</p>
+                                                <p class="reply delete_comment" onclick="deleteComment(commentId={{ comment.comment_id }})">Delete</p>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    {% for sub_comment, sub_ico in game_sub_comments|zip(sub_comment_authors_images) %}
+                                        {% if sub_comment.parent_id == comment.comment_id %}
+                                            <div class="sub comment_div">
+                                                <div class="comment_author_image">
+                                                    <div class="author_and_image">
+                                                        <img src="data:image/jpeg;base64, {{ sub_ico }}" alt="comment_author_ico" height="50" class="comment_author">
+                                                        <p class="comment_owner">{{ sub_comment.author_username }}</p>
+                                                    </div>
+                                                    <div class="date" style="color: #ffffff">
+                                                        <p class="publication_date">{{ sub_comment.timestamp.strftime("%b %d %Y %H:%M") }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="sub comment_div">
+                                                    <p class="comment_text">{{ sub_comment.text }}</p>
+                                                    {% if ((current_user.customer_username == sub_comment.author_username) or (login == "Admin")) %}
+                                                    <div class="crud_comments">
+                                                        <p onclick="editComment(commentText=`{{ sub_comment.text }}`, commentId={{ sub_comment.comment_id }})" class="reply edit_comment">Edit</p>
+                                                        <p onclick="deleteComment(commentId={{ sub_comment.comment_id }})" class="reply delete_comment">Delete</p>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endif %}
                             </div>
                         </div>
-                        {% endif %}
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
+                    {% endif %}
                 {% endfor %}
             </div>
             {% if current_user.is_authenticated or login == "Admin"%}
-            <div class="add_comment">
-                <form action="" method="post" class="customer_comments">
-                    <input type="hidden" name='parent' id="parent_comment" class="parent_comment" value="">
-                    <input type="hidden" name='edit' id="edit_comment" class="parent_comment" value="">
-                    <textarea id="comment" class="comment" maxlength="256" name='comment' placeholder="What do you think about {{ game_details.game_name }}?"></textarea>
-                    <input class="add_comment_input" type="submit" value="Add comment">
-                </form>
-            </div>
+                <div class="add_comment">
+                    <div class="reply_modal" id="reply_modal">
+                        <div id="input_and_hidden_field" class="input_and_hidden_field">
+                            <div class="inner_modal">
+                                <div class="reply_img">
+                                    <img class="reply_img_picture" src="{{ url_for('static', filename='PinClipart.com_welcome-back-clip-art_3434813 копия.png')}}" alt="reply_arrow">
+                                </div>
+                                <div class="reply_text_and_author">
+                                    <p class="comment_for_reply_author" id="comment_for_reply_author"></p>
+                                    <p class="comment_for_reply" id="comment_for_reply"></p>
+                                </div>
+                                <div class="reply_close">
+                                    <img src="{{ url_for('static', filename='close.png')}}" onclick="closeReply()" class='cancelReply' id='cancelReply'>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comment_input">
+                            <form action="" method="post" class="customer_comments">
+                                <input type="hidden" name='parent' id="parent_comment" class="parent_comment" value="">
+                                <input type="hidden" name='edit' id="edit_comment" class="parent_comment" value="">
+                                <textarea id="comment" class="comment" maxlength="256" name='comment' placeholder="What do you think about {{ game_details.game_name }}?"></textarea>
+                                <input class="add_comment_input" type="submit" value="Add comment">
+                            </form>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
                 <!--<p style="color: #ffffff" class="release_date">{{game_details.release_date}}</p>-->
                 <!--<p style="color: #ffffff" class="number_of_players">{{game_details.number_of_players}}</p>-->
@@ -118,8 +136,18 @@
     </div>
 </div>
 <script>
-        function parentReply(commentId){
+    function closeReply(){
+        document.getElementById('input_and_hidden_field').style.display = 'none';
+        document.getElementById('parent_comment').value = '';
+
+    }
+</script>
+<script>
+        function parentReply(commentId, commentAuthor, commentText){
             document.getElementById('parent_comment').value = commentId;
+            document.getElementById("input_and_hidden_field").style.display = 'block';
+            document.getElementById("comment_for_reply_author").innerHTML = commentAuthor;
+            document.getElementById("comment_for_reply").innerHTML = commentText;
         }
 </script>
 <script>

@@ -74,17 +74,17 @@
                         <div class="overlay">
                                 <div class="game_photo_div" game_id="{{ data.game_id }}">
                                         {% if login == 'Admin' %}
-                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} './static/mark.jpg' {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
+                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
                                         {% else %}
                                         <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
-                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} './static/mark.jpg' {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
+                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
                                         </a>
                                         {% endif %}
                                         {% if login == 'Admin' %}
                                                 <div class="admin_overlay">
-                                                        <a href="{{ url_for('edit_game', game_id=data.game_id) }}" class="admin_img"><img src="./static/white_pencil.png" alt="" height="60" class="hover_img"></a>
+                                                        <a href="{{ url_for('edit_game', game_id=data.game_id) }}" class="admin_img"><img src="{{ url_for('static', filename='white_pencil.png') }}" alt="" height="60" class="hover_img"></a>
 {#                                                        <input type="image" src="./static/bin.png" height="60" class="hover_img hide" game_id="{{ data.game_id }}">#}
-                                                        <a href="#" onclick="send({{ data.game_id }})" class="admin_img hide"><img src="./static/bin.png" alt="" height="60" class="hover_img"></a>
+                                                        <a href="#" onclick="send({{ data.game_id }})" class="admin_img hide"><img src="{{ url_for('static', filename='bin.png') }}" alt="" height="60" class="hover_img"></a>
                                                 </div>
                                         {% endif %}
                                         <div class="game_information" id="game_information">

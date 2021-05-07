@@ -37,10 +37,10 @@ class Games(db.Model):
 
 class GameImages(db.Model):
     __tablename__ = 'game_images'
-    game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'))
+    game_id = db.Column(db.Integer, db.ForeignKey('games.game_id', ondelete="CASCADE"))
     game_image_id = db.Column(db.Integer, primary_key=True)
     game_photo = db.Column(db.LargeBinary, nullable=False)
-    game = db.relationship("Games", backref=db.backref("games", uselist=False))
+    game = db.relationship("Games", backref=db.backref("games", uselist=False), passive_deletes=True)
 
 
 class Platforms(db.Model):
@@ -65,14 +65,14 @@ class Roles(db.Model):
 class Customers(db.Model, UserMixin):
     __tablename__ = 'customers'
     customer_id = db.Column(db.Integer, primary_key=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.role_id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.role_id', ondelete="CASCADE"))
     customer_email = db.Column(db.String(128), unique=True, nullable=False)
     customer_password = db.Column(db.String(128), nullable=False)
     customer_username = db.Column(db.String(64),nullable=False, unique=True)
     customer_photo = db.Column(db.LargeBinary)
     customer_first_name = db.Column(db.String(30))
     customer_last_name = db.Column(db.String(30))
-    role = db.relationship("Roles", backref=db.backref('roles'), uselist=False)
+    role = db.relationship("Roles", backref=db.backref('roles'), uselist=False, passive_deletes=True)
 
     def is_authenticated(self):
         return True

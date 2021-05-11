@@ -11,8 +11,8 @@
         <meta name="author" content="Bohdan Romanytsia">
         <link rel="icon" type="image/png" href="{{url_for('static', filename='ri2759.ico')}}">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" crossorigin="anonymous"></script>
         <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -151,35 +151,16 @@
     }
 </script>
 <script>
-    function minusGame(gameId) {
-        let currentValue = Number($('#amount'+gameId).text());
-        let currentPrice = Number($('#price'+gameId).text());
-        let standartPrice = Number($('#standart_price'+gameId).text());
-        if ( currentValue > 1 ){
-            currentValue -= 1;
-            $('#price'+gameId).text(Math.ceil((currentPrice-standartPrice)*100)/100);
-        };
-        $('#amount'+gameId).text(currentValue);
-    }
-</script>
-<script>
-    function addGame( gameId ) {
-        let currentValue = Number($('#amount'+gameId).text());
-        let currentPrice = Number($('#price'+gameId).text());
-        let standartPrice = Number($('#standart_price'+gameId).text());
-        currentValue += 1;
-        $('#amount'+gameId).text(currentValue);
-        $('#price'+gameId).text(Math.round((standartPrice*currentValue)*100)/100);  
-    }
-</script>
-<script>
-        $(document).ready(function(){
-            $(".minus, .plus").click(function(){
-                $('.price_for_one').each(function(){
-                    console.log($(this).text());
-                })
+    $(document).ready(function(){
+        $(".buy_button, .buy-button").click(function(){
+            $.ajax({
+                url: '{{url_for('ajax_add_to_cart')}}',
+                type: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: String($(this).attr('id')),
             });
         });
+    });
 </script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" crossorigin="anonymous"></script>
 </html>

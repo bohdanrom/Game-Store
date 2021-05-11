@@ -740,8 +740,8 @@ div.sub{
 }
 .cart_item_image{
     padding: 10px;
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
     margin-right: 5px;
 }
 .add_minus_amount{
@@ -771,10 +771,6 @@ div.sub{
     width: 20px;
     cursor: pointer;
 }
-table{
-    width: 91%;
-    overflow-y: auto;
-}
 td{
     padding: 0;
 }
@@ -785,23 +781,23 @@ td{
     border: 2px solid #000000;
 }
 .proceed{
-    padding: 10% 30%;
+    padding: 5px 15px;
     background: #169c3f;
     border-radius: 3%;
     font-size: 18px;
 }
 .cart_header{
     display: flex;
-    width: 87%;
     margin: 30px 0 30px 0;
 }
 .your_cart{
     font-weight: bold;
-    font-size: 40px;
+    font-size: 35px;
+    white-space: nowrap;
 }
 .price_div{
     font-weight: bold;
-    font-size: 40px;
+    font-size: 33px;
     display: flex;
 }
 .total_price_header{
@@ -811,5 +807,10 @@ td{
     display: flex;
 }
 .table_cart{
-    height: 598px;
+    height: 579px;
+    overflow-y: auto;
+    margin-bottom: 30px;
+}
+tbody {
+    height: 100px;
 }

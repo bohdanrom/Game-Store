@@ -1,6 +1,5 @@
 {% extends 'index.html' %}
-{% block title %}
-{% endblock %}
+{% block title %}Cart{% endblock %}
 {% block content %}
 <div class="row">
     <div class="cart">
@@ -11,7 +10,8 @@
             <div class="total_price_header">
                 <div class="price_div">
                     <p class="total">Total:</p>
-                    <p class="total_price" id="total"></p>
+                    <p class="total_price" id="total">0</p>
+                    <p>$</p>
                 </div>
                 <div class="proceed_button">
                     <a href="{{ url_for('order')}}" class="proceed">Proceed</a>
@@ -38,22 +38,22 @@
                             </td>
                             <td class="cart_game_amount">
                                 <div class="add_minus_amount">
-                                    <p class="minus" id="minus" onclick="minusGame({{ cart_item.game_id }})">&ndash;</p> 
-                                    <p class="amount" id="amount{{ cart_item.game_id }}">{{ cart_item.amount }}</p>
-                                    <p class="plus" id="plus" onclick="addGame({{ cart_item.game_id }})">+</p>
+                                    <p class="minus" id="minus" onclick="editQuantity(gameId={{ cart_item.game_id }}, action='minus')">&ndash;</p> 
+                                    <p class="amount" id="amount{{ cart_item.game_id }}" quantity="{{ game_detail.quantity_available }}">{{ cart_item.amount }}</p>
+                                    <p class="plus" id="plus" onclick="editQuantity(gameId={{ cart_item.game_id }}, action='plus')">+</p>
                                 </div>
                             </td>
                             <td class="cart_game_total_price">
                                 <div class="total_price_for_one_cart_item">
                                     <p>Total:</p>
                                     <div class="price_and_dollar">
-                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{{ game_detail.price }}</p>
+                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{{ cart_item.price }}</p>
                                         <p>$</p> 
                                     </div>
                                 </div>
                             </td>
                             <td class="cart_game_cancel">
-                                <img src="{{ url_for('static', filename='pngfind.com-3d-cross-png-6222696.png')}}" class="delete_game_from_cart_ico" alt="delete_game_from_cart_ico">
+                                <img src="{{ url_for('static', filename='pngfind.com-3d-cross-png-6222696.png')}}" cart_item_id="{{ cart_item.cart_item_id }}" class="delete_game_from_cart_ico" alt="delete_game_from_cart_ico">
                             </td>
                         </tr>
                         <tr>
@@ -70,4 +70,60 @@
         </div>
     </div>
 </div>
+<script>
+    function editQuantity(gameId, action) {
+        let currentValue = Number($('#amount'+gameId).text());
+        let currentPrice = Number($('#price'+gameId).text());
+        let standartPrice = Number($('#standart_price'+gameId).text());
+        if ( action == 'minus'){
+            if ( currentValue > 1 ){
+                currentValue -= 1;
+                $('#price'+gameId).text(Math.ceil((currentPrice-standartPrice)*100)/100);
+            };
+        }
+        else{
+            if (currentValue < Number($('#amount'+gameId).attr('quantity'))){
+                currentValue += 1;
+                $('#price'+gameId).text(Math.round((standartPrice*currentValue)*100)/100);
+            };
+        }
+        $('#amount'+gameId).text(currentValue);
+        $.ajax({
+                url: action == 'minus' ? '{{url_for('ajax_delete_from_cart')}}' : '{{url_for('ajax_add_to_cart')}}',
+                type: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: String(gameId),
+        });
+    };
+</script>
+<script>
+    $(document).ready(function(){
+        $(".minus, .plus").click(function(){
+            let totalPrice = 0;
+            $('.price_for_one').each(function(){
+                currentRow = parseFloat($(this).text());
+                totalPrice += currentRow;
+                });
+            $('#total').text(Math.round(totalPrice*100)/100);
+        });
+    });
+</script>
+<script>
+    $(document).ready(function(){
+        $(".delete_game_from_cart_ico").click(function(){
+            console.log($(this).attr('cart_item_id'));
+            $.ajax({
+                url: '{{url_for('ajax_delete_cart_item')}}',
+                type: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: String($(this).attr('cart_item_id')),
+            });
+            $(document).ajaxStop(function(){
+                window.location.reload();
+            });
+        });
+    });
+</script>
 {% endblock %}

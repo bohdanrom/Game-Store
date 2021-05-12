@@ -41,6 +41,11 @@ def is_cart_active():
         return False
 
 
+def add_to_db(row):
+    db.session.add(row)
+    db.session.commit()
+
+
 @app.after_request
 def redirect_to_login_page(response):
     if response.status_code == 401:
@@ -73,15 +78,13 @@ def add_new_game():
         for genre in return_genres():
             if genre.game_type_name in game_genre:
                 new_game.genres.append(genre)
-        db.session.add(new_game)
-        db.session.commit()
+        add_to_db(new_game)
         if not game_image:
             with open('./static/mark_edited2.png', 'rb') as default_photo:
                 game_image = default_photo.read()
         new_game_image = models.GameImages(game_id=new_game.game_id,
                                            game_photo=game_image)
-        db.session.add(new_game_image)
-        db.session.commit()
+        add_to_db(new_game_image)
         return redirect(url_for('display_all_games'))
     return render_template('add_game.html', user_photo=g.photo, genres=return_genres())
 
@@ -118,8 +121,7 @@ def display_game(game_id: int):
                 else:
                     new_comment = models.Comments(text=comment, game_id=game_id,
                                                   author_username=current_user.customer_username)
-                db.session.add(new_comment)
-                db.session.commit()
+                add_to_db(new_comment)
                 return redirect(request.url)
         game_photo = models.GameImages.query.filter_by(game_id=game_id).first()
         game_comments = models.Comments.query.filter_by(game_id=game_id).order_by(models.Comments.comment_id).all()
@@ -284,8 +286,7 @@ def signup():
                                             customer_email=new_user_login,
                                             customer_password=hash_password,
                                             role=models.Roles.query.get(2))
-                db.session.add(new_user)
-                db.session.commit()
+                add_to_db(new_user)
                 session['customer_first_name'] = new_user.customer_first_name
                 session['customer_last_name'] = new_user.customer_last_name
                 login_user(new_user)
@@ -358,8 +359,7 @@ def order():
                                       customer_phone=order_phone,
                                       payment_type=payment_type,
                                       comment=comment)
-            db.session.add(new_order)
-            db.session.commit()
+            add_to_db(new_order)
             return redirect('/')
     return render_template('order.html', user_photo=g.photo)
 
@@ -396,7 +396,6 @@ def ajax_add_to_cart():
             else:
                 cart_id = session['cart_game_id'].index(request.json)
                 session['cart'][cart_id][1] += 1
-            print(session)
         else:
             if is_cart_active():
                 user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
@@ -409,16 +408,13 @@ def ajax_add_to_cart():
                     db.session.commit()
                 else:
                     new_cart_item = models.CartItem(game_id=request.json, price=game.price, cart_id=user_cart.cart_id)
-                    db.session.add(new_cart_item)
-                    db.session.commit()
+                    add_to_db(new_cart_item)
                     cart_items.append(new_cart_item)
             elif not is_cart_active():
                 user_cart = models.Cart(customer_id=current_user.customer_id)
-                db.session.add(user_cart)
-                db.session.commit()
+                add_to_db(user_cart)
                 new_cart_item = models.CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
-                db.session.add(new_cart_item)
-                db.session.commit()
+                add_to_db(new_cart_item)
     return "Ok"
 
 
@@ -430,7 +426,6 @@ def ajax_delete_from_cart():
             cart_id = session['cart_game_id'].index(request.json)
             if session['cart'][cart_id][1] > 1:
                 session['cart'][cart_id][1] -= 1
-                print(session, "after delete")
         elif current_user.is_authenticated:
             user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
             if user_cart.cart_status:

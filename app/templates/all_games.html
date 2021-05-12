@@ -91,7 +91,9 @@
                                                 <div class="price_and_button" id="price_and_button">
                                                         <p class="game-price" id="game-price">{{ data.price }}$</p>
                                                                 <div class="buttons" id="buttons">
-                                                                        <button class="buy-button" id="{{ data.game_id }}">BUY</button>
+                                                                        {% if login != 'Admin' %}
+                                                                                <button class="buy-button" id="{{ data.game_id }}">BUY</button>
+                                                                        {% endif %}
                                                                 </div>
                                                 </div>
                                                 <div class="game_genres_and_name" id="game_genres_and_name">

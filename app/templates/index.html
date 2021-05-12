@@ -71,7 +71,7 @@
                                                 </p>
 				                        </div>
                                         <div class="navbar-nav">
-                                                <a href="{{ url_for('cart')}}" class="nav-item nav-link">
+                                                <a {% if login == 'Admin' %} href="{{ url_for('display_all_games')}}" {% else %} href="{{ url_for('cart')}}" {% endif %} class="nav-item nav-link">
                                                     <img height="20" src="{{ url_for('static', filename='pngaaa.com-3531796.png') }}" alt="Cart">
                                                 </a>
                                         </div>

@@ -21,7 +21,7 @@
         <div class="table_cart">
             <table>
                 <tbody>
-                    {% if cart_items%}
+                    {% if cart_items %}
                         {% for cart_item, cart_item_image, game_detail in cart_items|zip(cart_items_images, game_details) %}
                         <tr class="cart_element">
                             <td class="cart_game_image">
@@ -47,7 +47,7 @@
                                 <div class="total_price_for_one_cart_item">
                                     <p>Total:</p>
                                     <div class="price_and_dollar">
-                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{{ cart_item.price | default(cart_item[0]*cart_item[1])}}</p>
+                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{% if session['cart'] %} {{ cart_item[0]*cart_item[1] }} {% else %} {{ cart_item.price }} {% endif %}</p>
                                         <p>$</p> 
                                     </div>
                                 </div>
@@ -98,14 +98,24 @@
     };
 </script>
 <script>
+    function totalPriceDisplay(e){
+        let totalPrice = 0;
+        $('.price_for_one').each(function(){
+            currentRow = parseFloat($(this).text());
+            totalPrice += currentRow;
+        });
+        $('#total').text(Math.round(totalPrice*100)/100);
+    }
+</script>
+<script>
+    $(document).ready(function(){
+        totalPriceDisplay();
+    });
+</script>
+<script>
     $(document).ready(function(){
         $(".minus, .plus").click(function(){
-            let totalPrice = 0;
-            $('.price_for_one').each(function(){
-                currentRow = parseFloat($(this).text());
-                totalPrice += currentRow;
-                });
-            $('#total').text(Math.round(totalPrice*100)/100);
+            totalPriceDisplay();
         });
     });
 </script>

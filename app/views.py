@@ -195,7 +195,7 @@ def edit_game(game_id: int):
             if game_new_image:
                 game_image.game_photo = game_new_image
             db.session.commit()
-            return redirect("/")
+            return redirect("/add-game")
         return render_template('add_game.html',
                                game=game,
                                game_image=game_image,
@@ -328,39 +328,42 @@ def edit_profile():
 
 @app.route('/order', methods=["POST", "GET"])
 def order():
-    if request.method == "POST":
-        order_first_name = request.form.get("order_first_name")
-        order_last_name = request.form.get("order_last_name")
-        order_email = request.form.get("order_email")
-        order_phone = request.form.get("order_phone")
-        payment_type = request.form.get("payment_type")
-        comment = request.form.get("Comment")
-        if not current_user.is_authenticated:
-            if 'cart' in session:
-                for index, game in enumerate(session['cart_game_id']):
-                    game = models.Games.query.get(game)
-                    game.quantity_available -= session['cart'][index][1]
-                db.session.commit()
-                session.pop('cart', None)
-                session.pop('cart_game_id', None)
+    if current_user.role_id == 1:
+        return redirect('/')
+    else:
+        if request.method == "POST":
+            order_first_name = request.form.get("order_first_name")
+            order_last_name = request.form.get("order_last_name")
+            order_email = request.form.get("order_email")
+            order_phone = request.form.get("order_phone")
+            payment_type = request.form.get("payment_type")
+            comment = request.form.get("Comment")
+            if not current_user.is_authenticated:
+                if 'cart' in session:
+                    for index, game in enumerate(session['cart_game_id']):
+                        game = models.Games.query.get(game)
+                        game.quantity_available -= session['cart'][index][1]
+                    db.session.commit()
+                    session.pop('cart', None)
+                    session.pop('cart_game_id', None)
+                    return redirect('/')
+                return redirect('/cart')
+            elif current_user.is_authenticated:
+                user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+                user_cart.cart_status = False
+                user_cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
+                for elem in user_cart_items:
+                    game = models.Games.query.get(elem.game_id)
+                    game.quantity_available -= elem.amount
+                new_order = models.Orders(cart_id=user_cart.cart_id,
+                                          customer_first_name=order_first_name,
+                                          customer_last_name=order_last_name,
+                                          customer_email=order_email,
+                                          customer_phone=order_phone,
+                                          payment_type=payment_type,
+                                          comment=comment)
+                add_to_db(new_order)
                 return redirect('/')
-            return redirect('/cart')
-        elif current_user.is_authenticated:
-            user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
-            user_cart.cart_status = False
-            user_cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
-            for elem in user_cart_items:
-                game = models.Games.query.get(elem.game_id)
-                game.quantity_available -= elem.amount
-            new_order = models.Orders(cart_id=user_cart.cart_id,
-                                      customer_first_name=order_first_name,
-                                      customer_last_name=order_last_name,
-                                      customer_email=order_email,
-                                      customer_phone=order_phone,
-                                      payment_type=payment_type,
-                                      comment=comment)
-            add_to_db(new_order)
-            return redirect('/')
     return render_template('order.html', user_photo=g.photo)
 
 
@@ -375,13 +378,16 @@ def cart():
         else:
             return render_template('cart.html', user_photo=g.photo)
     elif current_user.is_authenticated:
-        user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
-        if user_cart.cart_status:
-            cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).order_by(models.CartItem.cart_item_id).all()
-            cart_items_images = [convert_image_from_binary_to_unicode(models.GameImages.query.filter_by(game_id=elem.game_id).first().game_photo) for elem in cart_items]
-            game_details = [models.Games.query.get(item.game_id) for item in cart_items]
+        if current_user.role_id == 1:
+            return redirect('/')
         else:
-            return render_template('cart.html', user_photo=g.photo)
+            user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+            if user_cart.cart_status:
+                cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).order_by(models.CartItem.cart_item_id).all()
+                cart_items_images = [convert_image_from_binary_to_unicode(models.GameImages.query.filter_by(game_id=elem.game_id).first().game_photo) for elem in cart_items]
+                game_details = [models.Games.query.get(item.game_id) for item in cart_items]
+            else:
+                return render_template('cart.html', user_photo=g.photo)
     return render_template('cart.html', cart_items=cart_items, cart_items_images=cart_items_images, game_details=game_details, user_photo=g.photo)
 
 
@@ -397,24 +403,25 @@ def ajax_add_to_cart():
                 cart_id = session['cart_game_id'].index(request.json)
                 session['cart'][cart_id][1] += 1
         else:
-            if is_cart_active():
-                user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
-                cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
-                cart_items_id = [item.game_id for item in cart_items]
-                if request.json in cart_items_id:
-                    game_index = cart_items_id.index(request.json)
-                    cart_items[game_index].amount += 1
-                    cart_items[game_index].price = cart_items[game_index].amount * game.price
-                    db.session.commit()
-                else:
-                    new_cart_item = models.CartItem(game_id=request.json, price=game.price, cart_id=user_cart.cart_id)
+            if current_user.role_id != 1:
+                if is_cart_active():
+                    user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+                    cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
+                    cart_items_id = [item.game_id for item in cart_items]
+                    if request.json in cart_items_id:
+                        game_index = cart_items_id.index(request.json)
+                        cart_items[game_index].amount += 1
+                        cart_items[game_index].price = cart_items[game_index].amount * game.price
+                        db.session.commit()
+                    else:
+                        new_cart_item = models.CartItem(game_id=request.json, price=game.price, cart_id=user_cart.cart_id)
+                        add_to_db(new_cart_item)
+                        cart_items.append(new_cart_item)
+                elif not is_cart_active():
+                    user_cart = models.Cart(customer_id=current_user.customer_id)
+                    add_to_db(user_cart)
+                    new_cart_item = models.CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
                     add_to_db(new_cart_item)
-                    cart_items.append(new_cart_item)
-            elif not is_cart_active():
-                user_cart = models.Cart(customer_id=current_user.customer_id)
-                add_to_db(user_cart)
-                new_cart_item = models.CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
-                add_to_db(new_cart_item)
     return "Ok"
 
 
@@ -427,15 +434,16 @@ def ajax_delete_from_cart():
             if session['cart'][cart_id][1] > 1:
                 session['cart'][cart_id][1] -= 1
         elif current_user.is_authenticated:
-            user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
-            if user_cart.cart_status:
-                cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
-                cart_items_id = [item.game_id for item in cart_items]
-                game_index = cart_items_id.index(request.json)
-                if cart_items[game_index].amount > 1:
-                    cart_items[game_index].amount -= 1
-                    cart_items[game_index].price = cart_items[game_index].amount * game.price
-                    db.session.commit()
+            if current_user.role_id != 1:
+                user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+                if user_cart.cart_status:
+                    cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
+                    cart_items_id = [item.game_id for item in cart_items]
+                    game_index = cart_items_id.index(request.json)
+                    if cart_items[game_index].amount > 1:
+                        cart_items[game_index].amount -= 1
+                        cart_items[game_index].price = cart_items[game_index].amount * game.price
+                        db.session.commit()
     return "Ok"
 
 

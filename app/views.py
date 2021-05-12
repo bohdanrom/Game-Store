@@ -218,6 +218,9 @@ def hide_game():
 
 @app.route('/')
 def display_all_games():
+    if not current_user.is_authenticated:
+        if 'cart' not in session:
+            session['cart'], session['cart_game_id'] = [], []
     if 'User' in admin_permission():
         all_games = models.Games.query.order_by(models.Games.game_id).filter_by(is_active=True).all()
     else:
@@ -325,19 +328,29 @@ def edit_profile():
 @app.route('/order', methods=["POST", "GET"])
 def order():
     if request.method == "POST":
-        if current_user.is_authenticated:
+        order_first_name = request.form.get("order_first_name")
+        order_last_name = request.form.get("order_last_name")
+        order_email = request.form.get("order_email")
+        order_phone = request.form.get("order_phone")
+        payment_type = request.form.get("payment_type")
+        comment = request.form.get("Comment")
+        if not current_user.is_authenticated:
+            if 'cart' in session:
+                for index, game in enumerate(session['cart_game_id']):
+                    game = models.Games.query.get(game)
+                    game.quantity_available -= session['cart'][index][1]
+                db.session.commit()
+                session.pop('cart', None)
+                session.pop('cart_game_id', None)
+                return redirect('/')
+            return redirect('/cart')
+        elif current_user.is_authenticated:
             user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
             user_cart.cart_status = False
             user_cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
             for elem in user_cart_items:
                 game = models.Games.query.get(elem.game_id)
                 game.quantity_available -= elem.amount
-            order_first_name = request.form.get("order_first_name")
-            order_last_name = request.form.get("order_last_name")
-            order_email = request.form.get("order_email")
-            order_phone = request.form.get("order_phone")
-            payment_type = request.form.get("payment_type")
-            comment = request.form.get("Comment")
             new_order = models.Orders(cart_id=user_cart.cart_id,
                                       customer_first_name=order_first_name,
                                       customer_last_name=order_last_name,
@@ -347,12 +360,21 @@ def order():
                                       comment=comment)
             db.session.add(new_order)
             db.session.commit()
+            return redirect('/')
     return render_template('order.html', user_photo=g.photo)
 
 
 @app.route('/cart', methods=["POST", "GET"])
 def cart():
-    if current_user.is_authenticated:
+    if not current_user.is_authenticated:
+        if 'cart' in session:
+            cart_items = session['cart']
+            game_details = [models.Games.query.get(item) for item in session['cart_game_id']]
+            cart_items_images = [convert_image_from_binary_to_unicode(
+                models.GameImages.query.filter_by(game_id=elem).first().game_photo) for elem in session['cart_game_id']]
+        else:
+            return render_template('cart.html', user_photo=g.photo)
+    elif current_user.is_authenticated:
         user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
         if user_cart.cart_status:
             cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).order_by(models.CartItem.cart_item_id).all()
@@ -360,8 +382,6 @@ def cart():
             game_details = [models.Games.query.get(item.game_id) for item in cart_items]
         else:
             return render_template('cart.html', user_photo=g.photo)
-    if request.method == "POST":
-        pass
     return render_template('cart.html', cart_items=cart_items, cart_items_images=cart_items_images, game_details=game_details, user_photo=g.photo)
 
 
@@ -369,35 +389,49 @@ def cart():
 def ajax_add_to_cart():
     if request.method == "POST":
         game = models.Games.query.get(int(request.json))
-        if is_cart_active():
-            user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
-            cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
-            cart_items_id = [item.game_id for item in cart_items]
-            if request.json in cart_items_id:
-                game_index = cart_items_id.index(request.json)
-                cart_items[game_index].amount += 1
-                cart_items[game_index].price = cart_items[game_index].amount * game.price
-                db.session.commit()
+        if not current_user.is_authenticated:
+            if request.json not in session['cart_game_id']:
+                session['cart'].append([float(game.price), 1])
+                session['cart_game_id'].append(request.json)
             else:
-                new_cart_item = models.CartItem(game_id=request.json, price=game.price, cart_id=user_cart.cart_id)
+                cart_id = session['cart_game_id'].index(request.json)
+                session['cart'][cart_id][1] += 1
+            print(session)
+        else:
+            if is_cart_active():
+                user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+                cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
+                cart_items_id = [item.game_id for item in cart_items]
+                if request.json in cart_items_id:
+                    game_index = cart_items_id.index(request.json)
+                    cart_items[game_index].amount += 1
+                    cart_items[game_index].price = cart_items[game_index].amount * game.price
+                    db.session.commit()
+                else:
+                    new_cart_item = models.CartItem(game_id=request.json, price=game.price, cart_id=user_cart.cart_id)
+                    db.session.add(new_cart_item)
+                    db.session.commit()
+                    cart_items.append(new_cart_item)
+            elif not is_cart_active():
+                user_cart = models.Cart(customer_id=current_user.customer_id)
+                db.session.add(user_cart)
+                db.session.commit()
+                new_cart_item = models.CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
                 db.session.add(new_cart_item)
                 db.session.commit()
-                cart_items.append(new_cart_item)
-        else:
-            user_cart = models.Cart(customer_id=current_user.customer_id)
-            db.session.add(user_cart)
-            db.session.commit()
-            new_cart_item = models.CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
-            db.session.add(new_cart_item)
-            db.session.commit()
     return "Ok"
 
 
 @app.route('/ajax_delete_from_cart', methods=["POST"])
 def ajax_delete_from_cart():
     if request.method == "POST":
-        if current_user.is_authenticated:
-            game = models.Games.query.get(int(request.json))
+        game = models.Games.query.get(int(request.json))
+        if not current_user.is_authenticated:
+            cart_id = session['cart_game_id'].index(request.json)
+            if session['cart'][cart_id][1] > 1:
+                session['cart'][cart_id][1] -= 1
+                print(session, "after delete")
+        elif current_user.is_authenticated:
             user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
             if user_cart.cart_status:
                 cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
@@ -413,10 +447,15 @@ def ajax_delete_from_cart():
 @app.route('/ajax_delete_cart_item', methods=["POST"])
 def ajax_delete_cart_item():
     if request.method == "POST":
-        if current_user.is_authenticated:
+        if not current_user.is_authenticated:
+            cart_id = session['cart_game_id'].index(request.json)
+            session['cart'].pop(cart_id)
+            session['cart_game_id'].pop(cart_id)
+        elif current_user.is_authenticated:
             cart_item = models.CartItem.query.get(request.json)
             db.session.delete(cart_item)
             db.session.commit()
+    return 'Ok'
 
 
 @manager.user_loader

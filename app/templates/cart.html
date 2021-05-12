@@ -25,7 +25,7 @@
                         {% for cart_item, cart_item_image, game_detail in cart_items|zip(cart_items_images, game_details) %}
                         <tr class="cart_element">
                             <td class="cart_game_image">
-                                <a href="{{ url_for('display_game', game_id=cart_item.game_id)}}">
+                                <a href="{{ url_for('display_game', game_id=game_detail.game_id)}}">
                                     <img src="data:image/jpeg;base64, {{ cart_item_image }}" alt="cart_item_image" class="cart_item_image">
                                 </a>
                             </td>
@@ -38,22 +38,22 @@
                             </td>
                             <td class="cart_game_amount">
                                 <div class="add_minus_amount">
-                                    <p class="minus" id="minus" onclick="editQuantity(gameId={{ cart_item.game_id }}, action='minus')">&ndash;</p> 
-                                    <p class="amount" id="amount{{ cart_item.game_id }}" quantity="{{ game_detail.quantity_available }}">{{ cart_item.amount }}</p>
-                                    <p class="plus" id="plus" onclick="editQuantity(gameId={{ cart_item.game_id }}, action='plus')">+</p>
+                                    <p class="minus" id="minus" onclick="editQuantity(gameId={{ game_detail.game_id }}, action='minus')">&ndash;</p>
+                                    <p class="amount" id="amount{{ game_detail.game_id }}" quantity="{{ game_detail.quantity_available }}">{{ cart_item.amount |default(cart_item[1])}}</p>
+                                    <p class="plus" id="plus" onclick="editQuantity(gameId={{ game_detail.game_id }}, action='plus')">+</p>
                                 </div>
                             </td>
                             <td class="cart_game_total_price">
                                 <div class="total_price_for_one_cart_item">
                                     <p>Total:</p>
                                     <div class="price_and_dollar">
-                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{{ cart_item.price }}</p>
+                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{{ cart_item.price | default(cart_item[0]*cart_item[1])}}</p>
                                         <p>$</p> 
                                     </div>
                                 </div>
                             </td>
                             <td class="cart_game_cancel">
-                                <img src="{{ url_for('static', filename='pngfind.com-3d-cross-png-6222696.png')}}" cart_item_id="{{ cart_item.cart_item_id }}" class="delete_game_from_cart_ico" alt="delete_game_from_cart_ico">
+                                <img src="{{ url_for('static', filename='pngfind.com-3d-cross-png-6222696.png')}}" {% if session['cart'] %} cart_item_id="{{ game_detail.game_id }}" {% else %} cart_item_id="{{ cart_item.cart_item_id }}"| default('{{ game_details.game_id }}') {% endif %} class="delete_game_from_cart_ico" alt="delete_game_from_cart_ico">
                             </td>
                         </tr>
                         <tr>

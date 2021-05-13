@@ -15,7 +15,7 @@
     backface-visibility: hidden;
     margin-bottom: 20px;
 }
-{% if login == 'Admin' %}
+{% if current_user.role_id == 1 %}
 .admin_overlay {
     transition: .5s ease;
     opacity: 0;
@@ -57,7 +57,7 @@
                                 </ul>
                 </div>
                 <div class="search_div">
-                    {% if login == 'Admin' %}
+                    {% if current_user.role_id == 1 %}
                         <div class="add_game_button">
                                 <a href="/add-game" class="add_game">Add game</a>
                         </div>
@@ -73,14 +73,14 @@
                 {% for data, photo in all_games|zip(game_images) %}
                         <div class="overlay">
                                 <div class="game_photo_div" game_id="{{ data.game_id }}">
-                                        {% if login == 'Admin' %}
+                                        {% if current_user.role_id == 1 %}
                                             <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
                                         {% else %}
                                         <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
                                             <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
                                         </a>
                                         {% endif %}
-                                        {% if login == 'Admin' %}
+                                        {% if current_user.role_id == 1 %}
                                                 <div class="admin_overlay">
                                                         <a href="{{ url_for('edit_game', game_id=data.game_id) }}" class="admin_img"><img src="{{ url_for('static', filename='white_pencil.png') }}" alt="" height="60" class="hover_img"></a>
 {#                                                        <input type="image" src="./static/bin.png" height="60" class="hover_img hide" game_id="{{ data.game_id }}">#}
@@ -91,7 +91,7 @@
                                                 <div class="price_and_button" id="price_and_button">
                                                         <p class="game-price" id="game-price">{{ data.price }}$</p>
                                                                 <div class="buttons" id="buttons">
-                                                                        {% if login != 'Admin' %}
+                                                                        {% if current_user.role_id != 1 %}
                                                                                 <button class="buy-button" id="{{ data.game_id }}">BUY</button>
                                                                         {% endif %}
                                                                 </div>

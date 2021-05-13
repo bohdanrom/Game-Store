@@ -71,8 +71,9 @@
                                                 </p>
 				                        </div>
                                         <div class="navbar-nav">
-                                                <a {% if login == 'Admin' %} href="{{ url_for('display_all_games')}}" {% else %} href="{{ url_for('cart')}}" {% endif %} class="nav-item nav-link">
+                                                <a {% if current_user.role_id == 1 %} href="{{ url_for('display_all_games')}}" {% else %} href="{{ url_for('cart')}}" {% endif %} class="nav-item nav-link">
                                                     <img height="20" src="{{ url_for('static', filename='pngaaa.com-3531796.png') }}" alt="Cart">
+                                                    <span class="total-count">{{ cart_item_count }}</span>
                                                 </a>
                                         </div>
                                         <div class="navbar-nav">
@@ -160,6 +161,14 @@
                 contentType: 'application/json',
                 data: String($(this).attr('id')),
             });
+        });
+    });
+</script>
+<script>
+    $(document).ready(function(){
+        $(".buy_button, .buy-button .delete_game_from_cart_ico").click(function(){
+            $('.total-count').html({{ cart_item_count }});
+            $("#result").html(ajax_load).load(loadUrl);
         });
     });
 </script>

@@ -13,7 +13,7 @@
                 <h1 class="game_name">{{game_details.game_name}}</h1>
                 <p class="price">{{game_details.price}}$</p>
             </div>
-            {% if login != 'Admin' %}
+            {% if current_user.role_id != 1 %}
                 <div class="button">
                     <button id="{{ game_details.game_id }}" class="buy_button">BUY</button>
                 </div>
@@ -57,7 +57,7 @@
                                     {% if current_user.is_authenticated %}
                                         <div class="crud_comments">
                                             <p onclick="parentReply(commentId={{ comment.comment_id }}, commentAuthor=`{{ comment.author_username }}`, commentText=`{{ comment.text }}`)" class="reply">Reply</p>
-                                            {% if ((current_user.customer_username == comment.author_username) or (login == "Admin")) %}
+                                            {% if ((current_user.customer_username == comment.author_username) or (current_user.role_id == 1)) %}
                                                 <p class="reply edit_comment" onclick="editComment(commentText=`{{ comment.text }}`, commentId={{ comment.comment_id }})">Edit</p>
                                                 <p class="reply delete_comment" onclick="deleteComment(commentId={{ comment.comment_id }})">Delete</p>
                                             {% endif %}
@@ -77,7 +77,7 @@
                                                 </div>
                                                 <div class="sub comment_div">
                                                     <p class="comment_text">{{ sub_comment.text }}</p>
-                                                    {% if ((current_user.customer_username == sub_comment.author_username) or (login == "Admin")) %}
+                                                    {% if ((current_user.customer_username == sub_comment.author_username) or (current_user.role_id == 1)) %}
                                                     <div class="crud_comments">
                                                         <p onclick="editComment(commentText=`{{ sub_comment.text }}`, commentId={{ sub_comment.comment_id }})" class="reply edit_comment">Edit</p>
                                                         <p onclick="deleteComment(commentId={{ sub_comment.comment_id }})" class="reply delete_comment">Delete</p>

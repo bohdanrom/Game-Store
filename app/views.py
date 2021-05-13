@@ -206,16 +206,13 @@ def edit_game(game_id: int):
 @app.route('/hide_game', methods=["POST"])
 @login_required
 def hide_game():
-    if 'User' in admin_permission():
-        return redirect('/')
+    game_id = request.json
+    game = models.Games.query.get(game_id)
+    if game.is_active:
+        game.is_active = False
     else:
-        game_id = request.json
-        game = models.Games.query.get(game_id)
-        if game.is_active:
-            game.is_active = False
-        else:
-            game.is_active = True
-        db.session.commit()
+        game.is_active = True
+    db.session.commit()
 
 
 @app.route('/')
@@ -239,9 +236,6 @@ def display_all_games():
                            genres=return_genres(),
                            login=g.admin_perm,
                            user_photo=g.photo)
-
-
-# =========================================
 
 
 @app.route('/login', methods=["POST", "GET"])
@@ -328,7 +322,7 @@ def edit_profile():
 
 @app.route('/order', methods=["POST", "GET"])
 def order():
-    if current_user.role_id == 1:
+    if current_user.is_authenticated and current_user.role_id == 1:
         return redirect('/')
     else:
         if request.method == "POST":
@@ -337,7 +331,7 @@ def order():
             order_email = request.form.get("order_email")
             order_phone = request.form.get("order_phone")
             payment_type = request.form.get("payment_type")
-            comment = request.form.get("Comment")
+            comment = request.form.get("comment")
             if not current_user.is_authenticated:
                 if 'cart' in session:
                     for index, game in enumerate(session['cart_game_id']):

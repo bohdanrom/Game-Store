@@ -20,12 +20,20 @@
     <style>
         .total-count{
             background: #e60000;
+            font-weight: bold;
+            font-size: 18px;
             border-radius: 40%;
             width: 15px;
             height: 10px;
-            padding: 1px 3px;
+            padding: 1px 4px;
             color: #ffffff;
     }
+    </style>
+{% else %}
+    <style>
+        .total-count{
+            display: none;    
+        }
     </style>
 {% endif %}
 	    <header id="header" class="header">
@@ -172,15 +180,10 @@
                 dataType: 'json',
                 contentType: 'application/json',
                 data: String($(this).attr('id')),
+                success: function(response){
+                    $('.total-count').html(response);
+                }
             });
-        });
-    });
-</script>
-<script>
-    $(document).ready(function(){
-        $(".buy_button, .buy-button .delete_game_from_cart_ico").click(function(){
-            $('.total-count').html({{ cart_item_count }});
-            $("#result").html(ajax_load).load(loadUrl);
         });
     });
 </script>

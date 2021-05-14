@@ -4,7 +4,6 @@
 <style>
 .overlay{
     position: relative;
-    width: 90%;
     margin-right: 20px;
 }
 .game_photo_div{
@@ -130,8 +129,9 @@
                 txtValue = listOfGames.textContent || listOfGames.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
                     game[i].style.display = "";
-            } else {
-                game[i].style.display = "none";
+                } 
+                else {
+                    game[i].style.display = "none";
                 }
             }
         }

@@ -172,37 +172,39 @@ header, footer{
 }
 .all_games{
     display: grid;
-    grid-row-gap: 35px;
+    /* grid-row-gap: 35px; */
     grid-template-columns: repeat(auto-fit, minmax(33.33%, 1fr));
+    grid-template-rows: 300px auto 300px;
     margin-left: 5%;
     margin-right: 10%;
     width: 90%;
     height: 645px;
     overflow-y:auto;
-    overflow-x: hidden;
 }
 .overlay:nth-child(3n+4){
-    width: 97%;
+    width: 97.5%;
     grid-column: span 3;
 }
 .overlay:nth-child(3n+5){
-    width: 95%;
     grid-column: span 2;
 }
+.overlay:nth-child(3n+6){
+    width: 93%;
+    grid-column: span 1;
+}
 .overlay:nth-child(6n+8){
-    width: 95%;
     grid-column: span 2;
 }
 .overlay:nth-child(7n+1){
-    width: 90%;
+    width: 93%;
     grid-column: span 1;
 }
 .overlay:nth-child(7n+2){
-    width: 90%;
+    width: 93%;
     grid-column: span 1;
 }
 .overlay:nth-child(7n+3){
-    width: 90%;
+    width: 92%;
     grid-column: span 1;
 }
 ::-webkit-scrollbar{
@@ -226,6 +228,7 @@ header, footer{
 .game_photo_div{
     color: #ffffff;
     width: 90%;
+    height: 100%;
 }
 .buy-button{
     color: rgba(255,255,255,0.85);
@@ -243,6 +246,11 @@ header, footer{
 }
 .game_ico{
     height: 200px;
+    width: 100%;
+    border-radius: 10px;
+}
+.game_photo_div::nth-of-type(3n+4) img{
+    height: 400px;
     width: 100%;
     border-radius: 10px;
 }

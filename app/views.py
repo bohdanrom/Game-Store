@@ -423,7 +423,8 @@ def ajax_add_to_cart():
                     add_to_db(user_cart)
                     new_cart_item = models.CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
                     add_to_db(new_cart_item)
-    return "Ok"
+    return str(len(session['cart'])) if not current_user.is_authenticated \
+        else str(len(models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()))
 
 
 @app.route('/ajax_delete_from_cart', methods=["POST"])
@@ -445,7 +446,8 @@ def ajax_delete_from_cart():
                         cart_items[game_index].amount -= 1
                         cart_items[game_index].price = cart_items[game_index].amount * game.price
                         db.session.commit()
-    return "Ok"
+    return str(len(session['cart'])) if not current_user.is_authenticated \
+        else str(len(models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()))
 
 
 @app.route('/ajax_delete_cart_item', methods=["POST"])
@@ -456,10 +458,13 @@ def ajax_delete_cart_item():
             session['cart'].pop(cart_id)
             session['cart_game_id'].pop(cart_id)
         elif current_user.is_authenticated:
+            user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
+                models.Cart.date.desc()).first()
             cart_item = models.CartItem.query.get(request.json)
             db.session.delete(cart_item)
             db.session.commit()
-    return 'Ok'
+    return str(len(session['cart'])) if not current_user.is_authenticated \
+        else str(len(models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()))
 
 
 @manager.user_loader

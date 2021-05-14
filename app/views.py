@@ -157,12 +157,12 @@ def display_game(game_id: int):
         return render_template("game.html",
                                game_details=game_details,
                                game_image=game_image,
-                               login=g.admin_perm,
                                game_comments=game_comments,
                                game_sub_comments=game_sub_comments,
                                comment_authors_images=comment_authors_images,
                                sub_comment_authors_images=sub_comment_authors_images,
-                               user_photo=g.photo)
+                               user_photo=g.photo,
+                               cart_item_count=g.cart)
     return redirect('/')
 
 
@@ -200,6 +200,7 @@ def edit_game(game_id: int):
                                game=game,
                                game_image=game_image,
                                user_photo=g.photo,
+                               cart_item_count=g.cart,
                                genres=return_genres())
 
 
@@ -234,8 +235,8 @@ def display_all_games():
                            all_games=all_games,
                            game_images=game_images,
                            genres=return_genres(),
-                           login=g.admin_perm,
-                           user_photo=g.photo)
+                           user_photo=g.photo,
+                           cart_item_count=g.cart)
 
 
 @app.route('/login', methods=["POST", "GET"])
@@ -254,7 +255,7 @@ def login():
         else:
             flash('Please, fill both fields email and password')
         return redirect(url_for('display_all_games'))
-    return redirect(url_for('display_all_games', user_photo=g.photo))
+    return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
 
 
 @app.route('/signup', methods=["POST", "GET"])
@@ -284,8 +285,8 @@ def signup():
                 session['customer_first_name'] = new_user.customer_first_name
                 session['customer_last_name'] = new_user.customer_last_name
                 login_user(new_user)
-                return redirect(url_for('display_all_games', user_photo=g.photo))
-    return redirect(url_for('display_all_games', user_photo=g.photo))
+                return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
+    return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
 
 
 @app.route('/logout', methods=["POST", "GET"])
@@ -294,7 +295,7 @@ def logout():
     session.pop('customer_first_name', None)
     session.pop('customer_last_name', None)
     logout_user()
-    return redirect(url_for('display_all_games'))
+    return redirect(url_for('display_all_games', cart_item_count=g.cart))
 
 
 @app.route('/edit_profile', methods=["GET", "POST"])
@@ -317,7 +318,8 @@ def edit_profile():
         return redirect(url_for('display_all_games'))
     return render_template('user_profile.html',
                            customer=current_user,
-                           user_photo=g.photo)
+                           user_photo=g.photo,
+                           cart_item_count=g.cart)
 
 
 @app.route('/order', methods=["POST", "GET"])
@@ -358,7 +360,7 @@ def order():
                                           comment=comment)
                 add_to_db(new_order)
                 return redirect('/')
-    return render_template('order.html', user_photo=g.photo)
+    return render_template('order.html', user_photo=g.photo, cart_item_count=g.cart)
 
 
 @app.route('/cart', methods=["POST", "GET"])
@@ -370,7 +372,7 @@ def cart():
             cart_items_images = [convert_image_from_binary_to_unicode(
                 models.GameImages.query.filter_by(game_id=elem).first().game_photo) for elem in session['cart_game_id']]
         else:
-            return render_template('cart.html', user_photo=g.photo)
+            return render_template('cart.html', user_photo=g.photo, cart_item_count=g.cart)
     elif current_user.is_authenticated:
         if current_user.role_id == 1:
             return redirect('/')
@@ -381,8 +383,13 @@ def cart():
                 cart_items_images = [convert_image_from_binary_to_unicode(models.GameImages.query.filter_by(game_id=elem.game_id).first().game_photo) for elem in cart_items]
                 game_details = [models.Games.query.get(item.game_id) for item in cart_items]
             else:
-                return render_template('cart.html', user_photo=g.photo)
-    return render_template('cart.html', cart_items=cart_items, cart_items_images=cart_items_images, game_details=game_details, user_photo=g.photo)
+                return render_template('cart.html', user_photo=g.photo, cart_item_count=g.cart)
+    return render_template('cart.html',
+                           cart_items=cart_items,
+                           cart_items_images=cart_items_images,
+                           game_details=game_details,
+                           cart_item_count=g.cart,
+                           user_photo=g.photo)
 
 
 @app.route('/ajax_add_to_cart', methods=["POST"])
@@ -473,16 +480,17 @@ def load_users():
     if current_user.is_authenticated:
         try:
             g.user = current_user.get_id()
-            g.admin_perm = current_user.role.name
             g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
+            g.cart_id = models.Cart.query.filter_by(customer_id=g.user).order_by(models.Cart.date.desc()).first().cart_id
+            g.cart = len(models.CartItem.query.filter_by(cart_id=g.cart_id).all())
         except AttributeError:
             g.user = None
-            g.admin_perm = None
             g.photo = None
+            g.cart = 0
     else:
         g.user = None
-        g.admin_perm = None
         g.photo = None
+        g.cart = len(session['cart'])
 
 
 if __name__ == '__main__':

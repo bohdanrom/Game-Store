@@ -4,7 +4,7 @@
 <style>
 .overlay{
     position: relative;
-    width: 30%;
+    width: 90%;
     margin-right: 20px;
 }
 .game_photo_div{
@@ -13,14 +13,13 @@
     display: block;
     transition: .5s ease;
     backface-visibility: hidden;
-    margin-bottom: 20px;
 }
 {% if current_user.role_id == 1 %}
 .admin_overlay {
     transition: .5s ease;
     opacity: 0;
     position: absolute;
-    top: 32%;
+    top: 35%;
     left: 50%;
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
@@ -35,11 +34,8 @@
 .admin_img {
     padding: 20px;
     margin-right: 5px;
-}
-.hover_img{
-    z-index: 10;
+    top: 50%;
     left: 50%;
-    top: 35%;
 }
 .hover_img:hover{
     transform: scale(1.2);
@@ -62,7 +58,7 @@
                                 <a href="/add-game" class="add_game">Add game</a>
                         </div>
                     {% endif %}
-                        <form class="search" id="search" method="post">
+                        <form class="search" id="search">
                                 <input type="text" class="search_game" name="search" id="live_search" placeholder="Enter game name" onkeyup="myFunction()">
                         </form>
                 </div>
@@ -74,7 +70,7 @@
                         <div class="overlay">
                                 <div class="game_photo_div" game_id="{{ data.game_id }}">
                                         {% if current_user.role_id == 1 %}
-                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
+                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" alt="game_img" class="game_ico" id="game_ico">
                                         {% else %}
                                         <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
                                             <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
@@ -82,9 +78,12 @@
                                         {% endif %}
                                         {% if current_user.role_id == 1 %}
                                                 <div class="admin_overlay">
-                                                        <a href="{{ url_for('edit_game', game_id=data.game_id) }}" class="admin_img"><img src="{{ url_for('static', filename='white_pencil.png') }}" alt="" height="60" class="hover_img"></a>
-{#                                                        <input type="image" src="./static/bin.png" height="60" class="hover_img hide" game_id="{{ data.game_id }}">#}
-                                                        <a href="#" onclick="send({{ data.game_id }})" class="admin_img hide"><img src="{{ url_for('static', filename='bin.png') }}" alt="" height="60" class="hover_img"></a>
+                                                        <a href="{{ url_for('edit_game', game_id=data.game_id) }}" class="admin_img">
+                                                            <img src="{{ url_for('static', filename='white_pencil.png') }}" alt="" height="60" class="hover_img">
+                                                        </a>
+                                                        <a href="#" onclick="send({{ data.game_id }})" class="admin_img hide">
+                                                            <img src="{{ url_for('static', filename='bin.png') }}" alt="" height="60" class="hover_img">
+                                                        </a>
                                                 </div>
                                         {% endif %}
                                         <div class="game_information" id="game_information">

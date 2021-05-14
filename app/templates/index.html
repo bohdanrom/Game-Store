@@ -16,6 +16,18 @@
         <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
+{% if current_user.role_id != 1 %}
+    <style>
+        .total-count{
+            background: #e60000;
+            border-radius: 40%;
+            width: 15px;
+            height: 10px;
+            padding: 1px 3px;
+            color: #ffffff;
+    }
+    </style>
+{% endif %}
 	    <header id="header" class="header">
 		        <div class="container">
 			            <div class="row">

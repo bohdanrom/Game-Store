@@ -8,26 +8,34 @@ Order
         <div class="complete_order">
             <h1 class="complete_order_h1">Completing your order</h1>
         </div>
+        {% for message in get_flashed_messages(with_categories=True) %}
+            <div class="alert alert-{{ message[0] }} alert-dismissible show" id='alert_for_order' role="alert">
+                {{ message[1] }}
+                <button type="button" class="close">
+                    <span onclick="hideAlert()" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
         <div class="order">
             <form class="order_form" method="post" action="">
                 <div class="field">
-                    <input type="text" id="order_first_name" class="order_input" name="order_first_name">
+                    <input type="text" id="order_first_name" class="order_input" name="order_first_name" required>
                     <label class="order_label" for="order_first_name">First Name</label>
                 </div>
                 <div class="field">
-                    <input type="text" id="order_last_name" class="order_input" name="order_last_name">
+                    <input type="text" id="order_last_name" class="order_input" name="order_last_name" required>
                     <label class="order_label" for="order_last_name">Last Name</label>
                 </div>
                 <div class="field">
-                    <input type="text" id="order_email" class="order_input" name="order_email">
+                    <input type="text" id="order_email" class="order_input" name="order_email" required>
                     <label class="order_label" for="order_email">Email</label>
                 </div>
                 <div class="field">
-                    <input type="text" id="order_phone" class="order_input" name="order_phone" pattern=^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$>
+                    <input type="text" id="order_phone" class="order_input" name="order_phone" placeholder="In format +380679953365" pattern=^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$ required>
                     <label class="order_label" for="order_phone">Phone</label>
                 </div>
                 <div class="field">
-                <select name="payment_type" id="payment_type" class="order_input">
+                <select name="payment_type" id="payment_type" class="order_input" required>
                     <option value="Credit card">Credit card</option>
                     <option value="Cash">Cash</option>
                 </select>
@@ -38,10 +46,15 @@ Order
                     <label class="order_label" for="payment_type">Comments(optional)</label>
                 </div>
                 <div class="order_button">
-                    <input type="submit"  class="submit input" value="Order">
+                    <input type="submit" onclick="orderOverlay(state='block')" class="submit input" value="Order">
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+    function orderOverlay(state){
+        document.getElementById('gray').style.display = state;
+    }
+</script>
 {% endblock %}

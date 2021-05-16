@@ -25,14 +25,15 @@ def convert_image_from_binary_to_unicode(image):
 
 def admin_permission():
     try:
-        user_role = models.Customers.query.filter_by(customer_id=g.user).first().role.name
+        user_role = models.Customers.query.get(current_user.get_id()).role_id
     except AttributeError:
-        user_role = 'Unauthorized User'
+        user_role = 2
     return user_role
 
 
 def is_cart_active():
-    user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+    user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
+        models.Cart.date.desc()).first()
     try:
         if user_cart.cart_status:
             return True
@@ -56,7 +57,8 @@ def redirect_to_login_page(response):
 @app.route('/add-game', methods=["GET", "POST"])
 @login_required
 def add_new_game():
-    if 'User' in admin_permission():
+    g.photo = convert_image_from_binary_to_unicode(models.Customers.query.get(current_user.get_id()).customer_photo)
+    if admin_permission() == 2:
         return redirect('/')
     if request.method == 'POST':
         game_name = request.form.get('new_game_name')
@@ -68,7 +70,7 @@ def add_new_game():
                     game_price = 999.99
         except ValueError:
             flash('Game price must be numeric!')
-            return redirect('#')
+            return redirect('')
         game_genre = request.form.getlist('new_game_genre')
         game_description = request.form.get('new_game_description')
         game_image = request.files['new_game_ico'].read()
@@ -94,7 +96,7 @@ def add_new_game():
 def delete_comment():
     comment_id = request.json
     comment = models.Comments.query.get(int(comment_id))
-    if comment.author_username == current_user.customer_username or admin_permission() == "Admin":
+    if comment.author_username == current_user.customer_username or admin_permission() == 1:
         db.session.delete(comment)
         db.session.commit()
     return "Ok"
@@ -127,10 +129,12 @@ def display_game(game_id: int):
         game_comments = models.Comments.query.filter_by(game_id=game_id).order_by(models.Comments.comment_id).all()
         game_sub_comments = models.Comments.query.filter_by(game_id=game_id).filter(
             models.Comments.parent_id != None).order_by(models.Comments.comment_id).all()
-        comments_authors = [models.Customers.query.filter_by(customer_username=comment.author_username).order_by(models.Customers.customer_id).first()
+        comments_authors = [models.Customers.query.filter_by(customer_username=comment.author_username).order_by(
+            models.Customers.customer_id).first()
                             for comment in game_comments
                             ]
-        sub_comment_authors = [models.Customers.query.filter_by(customer_username=comment.author_username).order_by(models.Customers.customer_id).first()
+        sub_comment_authors = [models.Customers.query.filter_by(customer_username=comment.author_username).order_by(
+            models.Customers.customer_id).first()
                                for comment in game_sub_comments
                                ]
 
@@ -168,7 +172,8 @@ def display_game(game_id: int):
 
 @app.route('/<int:game_id>/edit', methods=["GET", "POST"])
 def edit_game(game_id: int):
-    if 'User' in admin_permission():
+    g.photo = convert_image_from_binary_to_unicode(models.Customers.query.get(current_user.get_id()).customer_photo)
+    if admin_permission() == 2:
         return redirect(f'/{game_id}')
     else:
         game = models.Games.query.get(game_id)
@@ -183,7 +188,7 @@ def edit_game(game_id: int):
                         game.price = 999.99
             except ValueError:
                 flash('Game price must be numeric!')
-                return redirect('#')
+                return redirect('')
             game_genres = request.form.getlist('new_game_genre')
             game.game_description = request.form.get('new_game_description')
             game_new_image = request.files['new_game_ico'].read()
@@ -214,6 +219,7 @@ def hide_game():
     else:
         game.is_active = True
     db.session.commit()
+    return 'Ok'
 
 
 @app.route('/')
@@ -221,7 +227,7 @@ def display_all_games():
     if not current_user.is_authenticated:
         if 'cart' not in session:
             session['cart'], session['cart_game_id'] = [], []
-    if 'User' in admin_permission():
+    if admin_permission() == 2:
         all_games = models.Games.query.order_by(models.Games.game_id).filter_by(is_active=True).all()
     else:
         all_games = models.Games.query.order_by(models.Games.game_id).all()
@@ -251,10 +257,10 @@ def login():
                 session['customer_first_name'] = user_credentials.customer_first_name
                 session['customer_last_name'] = user_credentials.customer_last_name
                 return redirect(url_for('display_all_games', user_photo=g.photo))
-            return redirect('/login')
-        else:
-            flash('Please, fill both fields email and password')
-        return redirect(url_for('display_all_games'))
+            flash('Incorrect password')
+            return redirect('/' + '?showModal=' + 'true')
+        flash('Please, fill both fields email and password')
+        return redirect('/' + '?showModal=' + 'true')
     return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
 
 
@@ -270,22 +276,31 @@ def signup():
         if not (
                 new_user_first_name or new_user_last_name or new_user_login or new_user_password or new_user_password_verification):
             flash('Please, fill all the fields')
+            return redirect('/' + '?showModalSignUp=' + 'true')
         elif new_user_password != new_user_password_verification:
             flash('Passwords not match')
+            return redirect('/' + '?showModalSignUp=' + 'true')
         else:
             if new_user_password_verification == new_user_password:
-                hash_password = generate_password_hash(new_user_password)
-                new_user = models.Customers(customer_first_name=new_user_first_name,
-                                            customer_last_name=new_user_last_name,
-                                            customer_username=new_user_username,
-                                            customer_email=new_user_login,
-                                            customer_password=hash_password,
-                                            role=models.Roles.query.get(2))
-                add_to_db(new_user)
-                session['customer_first_name'] = new_user.customer_first_name
-                session['customer_last_name'] = new_user.customer_last_name
-                login_user(new_user)
-                return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
+                if models.Customers.query.filter_by(customer_email=new_user_login).first():
+                    flash('A user with this email already exists')
+                    return redirect('/' + '?showModalSignUp=' + 'true')
+                elif models.Customers.query.filter_by(customer_username=new_user_username).first():
+                    flash('Someone already has that username')
+                    return redirect('/' + '?showModalSignUp=' + 'true')
+                else:
+                    hash_password = generate_password_hash(new_user_password)
+                    new_user = models.Customers(customer_first_name=new_user_first_name,
+                                                customer_last_name=new_user_last_name,
+                                                customer_username=new_user_username,
+                                                customer_email=new_user_login,
+                                                customer_password=hash_password,
+                                                role=models.Roles.query.get(2).role_id)
+                    add_to_db(new_user)
+                    session['customer_first_name'] = new_user.customer_first_name
+                    session['customer_last_name'] = new_user.customer_last_name
+                    login_user(new_user)
+                    return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
     return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
 
 
@@ -324,43 +339,52 @@ def edit_profile():
 
 @app.route('/order', methods=["POST", "GET"])
 def order():
-    if current_user.is_authenticated and current_user.role_id == 1:
-        return redirect('/')
-    else:
+    if admin_permission() == 2:
         if request.method == "POST":
-            order_first_name = request.form.get("order_first_name")
-            order_last_name = request.form.get("order_last_name")
-            order_email = request.form.get("order_email")
-            order_phone = request.form.get("order_phone")
-            payment_type = request.form.get("payment_type")
-            comment = request.form.get("comment")
-            if not current_user.is_authenticated:
-                if 'cart' in session:
-                    for index, game in enumerate(session['cart_game_id']):
-                        game = models.Games.query.get(game)
-                        game.quantity_available -= session['cart'][index][1]
-                    db.session.commit()
-                    session.pop('cart', None)
-                    session.pop('cart_game_id', None)
-                    return redirect('/')
-                return redirect('/cart')
-            elif current_user.is_authenticated:
-                user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
-                user_cart.cart_status = False
-                user_cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
-                for elem in user_cart_items:
-                    game = models.Games.query.get(elem.game_id)
-                    game.quantity_available -= elem.amount
-                new_order = models.Orders(cart_id=user_cart.cart_id,
-                                          customer_first_name=order_first_name,
-                                          customer_last_name=order_last_name,
-                                          customer_email=order_email,
-                                          customer_phone=order_phone,
-                                          payment_type=payment_type,
-                                          comment=comment)
-                add_to_db(new_order)
-                return redirect('/')
-    return render_template('order.html', user_photo=g.photo, cart_item_count=g.cart)
+            if (not current_user.is_authenticated and not len(session['cart'])) \
+                    or \
+                    (current_user.is_authenticated and not len(models.CartItem.query.filter_by(
+                        cart_id=models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
+                            models.Cart.date.desc()).first()).all())):
+                flash('You have no products added in your Shopping Cart', 'danger')
+            else:
+                order_first_name = request.form.get("order_first_name")
+                order_last_name = request.form.get("order_last_name")
+                order_email = request.form.get("order_email")
+                order_phone = request.form.get("order_phone")
+                payment_type = request.form.get("payment_type")
+                comment = request.form.get("comment")
+                if not current_user.is_authenticated:
+                    if 'cart' in session:
+                        for index, game in enumerate(session['cart_game_id']):
+                            game = models.Games.query.get(game)
+                            game.quantity_available -= session['cart'][index][1]
+                        db.session.commit()
+                        session.pop('cart', None)
+                        session.pop('cart_game_id', None)
+                        flash('Thank you, we will send the game licenses to the email you wrote in the order form', 'success')
+                        return redirect('/order')
+                    return redirect('/cart')
+                elif current_user.is_authenticated:
+                    user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
+                        models.Cart.date.desc()).first()
+                    user_cart.cart_status = False
+                    user_cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
+                    for elem in user_cart_items:
+                        game = models.Games.query.get(elem.game_id)
+                        game.quantity_available -= elem.amount
+                    new_order = models.Orders(cart_id=user_cart.cart_id,
+                                              customer_first_name=order_first_name,
+                                              customer_last_name=order_last_name,
+                                              customer_email=order_email,
+                                              customer_phone=order_phone,
+                                              payment_type=payment_type,
+                                              comment=comment)
+                    add_to_db(new_order)
+                    flash('Thank you, we will send the game licenses to the email you wrote in the order form', 'success')
+                    return redirect('/order')
+        return render_template('order.html', user_photo=g.photo, cart_item_count=g.cart)
+    return redirect('/')
 
 
 @app.route('/cart', methods=["POST", "GET"])
@@ -374,13 +398,16 @@ def cart():
         else:
             return render_template('cart.html', user_photo=g.photo, cart_item_count=g.cart)
     elif current_user.is_authenticated:
-        if current_user.role_id == 1:
+        if admin_permission() == 1:
             return redirect('/')
         else:
-            user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+            user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
+                models.Cart.date.desc()).first()
             if user_cart.cart_status:
-                cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).order_by(models.CartItem.cart_item_id).all()
-                cart_items_images = [convert_image_from_binary_to_unicode(models.GameImages.query.filter_by(game_id=elem.game_id).first().game_photo) for elem in cart_items]
+                cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).order_by(
+                    models.CartItem.cart_item_id).all()
+                cart_items_images = [convert_image_from_binary_to_unicode(
+                    models.GameImages.query.filter_by(game_id=elem.game_id).first().game_photo) for elem in cart_items]
                 game_details = [models.Games.query.get(item.game_id) for item in cart_items]
             else:
                 return render_template('cart.html', user_photo=g.photo, cart_item_count=g.cart)
@@ -406,7 +433,8 @@ def ajax_add_to_cart():
         else:
             if current_user.role_id != 1:
                 if is_cart_active():
-                    user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+                    user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
+                        models.Cart.date.desc()).first()
                     cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
                     cart_items_id = [item.game_id for item in cart_items]
                     if request.json in cart_items_id:
@@ -415,13 +443,15 @@ def ajax_add_to_cart():
                         cart_items[game_index].price = cart_items[game_index].amount * game.price
                         db.session.commit()
                     else:
-                        new_cart_item = models.CartItem(game_id=request.json, price=game.price, cart_id=user_cart.cart_id)
+                        new_cart_item = models.CartItem(game_id=request.json, price=game.price,
+                                                        cart_id=user_cart.cart_id)
                         add_to_db(new_cart_item)
                         cart_items.append(new_cart_item)
                 elif not is_cart_active():
                     user_cart = models.Cart(customer_id=current_user.customer_id)
                     add_to_db(user_cart)
-                    new_cart_item = models.CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
+                    new_cart_item = models.CartItem(game_id=int(request.json), price=game.price,
+                                                    cart_id=user_cart.cart_id)
                     add_to_db(new_cart_item)
     return str(len(session['cart'])) if not current_user.is_authenticated \
         else str(len(models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()))
@@ -436,8 +466,9 @@ def ajax_delete_from_cart():
             if session['cart'][cart_id][1] > 1:
                 session['cart'][cart_id][1] -= 1
         elif current_user.is_authenticated:
-            if current_user.role_id != 1:
-                user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(models.Cart.date.desc()).first()
+            if admin_permission() == 2:
+                user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
+                    models.Cart.date.desc()).first()
                 if user_cart.cart_status:
                     cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
                     cart_items_id = [item.game_id for item in cart_items]
@@ -474,19 +505,14 @@ def load_user(customer_id):
     return None
 
 
-@manager.unauthorized_handler
-def unauthorized():
-    flash('You must be logged in to view that page.')
-    return redirect(url_for('display_all_games'))
-
-
 @app.before_request
 def load_users():
     if current_user.is_authenticated:
         try:
             g.user = current_user.get_id()
             g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
-            g.cart_id = models.Cart.query.filter_by(customer_id=g.user).order_by(models.Cart.date.desc()).first().cart_id
+            g.cart_id = models.Cart.query.filter_by(customer_id=g.user).order_by(
+                models.Cart.date.desc()).first().cart_id
             g.cart = len(models.CartItem.query.filter_by(cart_id=g.cart_id).all())
         except AttributeError:
             g.user = None
@@ -495,7 +521,7 @@ def load_users():
     else:
         g.user = None
         g.photo = None
-        g.cart = len(session['cart'])
+        g.cart = len(session['cart']) if 'cart' in session else 0
 
 
 if __name__ == '__main__':

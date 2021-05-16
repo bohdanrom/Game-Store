@@ -1,3 +1,6 @@
+html{
+    scroll-behavior: smooth;
+}
 body{
 	margin: 0;
 	padding: 0;
@@ -147,8 +150,9 @@ header, footer{
     color: #ffffff;
     width: 96%;
 }
-.about_game{
-    margin: 0 auto;
+.about_game_total{
+    margin: 0 25px 0 12px;
+    width: 90%;
 }
 .game_genres{
     display: flex;
@@ -172,39 +176,48 @@ header, footer{
 }
 .all_games{
     display: grid;
-    /* grid-row-gap: 35px; */
-    grid-template-columns: repeat(auto-fit, minmax(33.33%, 1fr));
-    grid-template-rows: 300px auto 300px;
-    margin-left: 5%;
+    grid-row-gap: 35px;
+    grid-template-columns: repeat(auto-fill, minmax(33.33%, 1fr));
+    margin-left: 4%;
     margin-right: 10%;
     width: 90%;
     height: 645px;
     overflow-y:auto;
 }
-.overlay:nth-child(3n+4){
-    width: 97.5%;
-    grid-column: span 3;
-}
-.overlay:nth-child(3n+5){
+.overlay:nth-child(9n+4){
+    width: 95%;
     grid-column: span 2;
 }
-.overlay:nth-child(3n+6){
-    width: 93%;
-    grid-column: span 1;
-}
-.overlay:nth-child(6n+8){
+.overlay:nth-child(9n+7){
+    width: 95%;
     grid-column: span 2;
 }
-.overlay:nth-child(7n+1){
-    width: 93%;
+.overlay:nth-child(9n+8){
+    width: 95%;
+    grid-column: span 2;
+}
+.overlay:nth-child(9n+1){
+    width: 90%;
     grid-column: span 1;
 }
-.overlay:nth-child(7n+2){
-    width: 93%;
+.overlay:nth-child(9n+2){
+    width: 90%;
     grid-column: span 1;
 }
-.overlay:nth-child(7n+3){
-    width: 92%;
+.overlay:nth-child(9n+3){
+    width: 90%;
+    grid-column: span 1;
+}
+.overlay:nth-child(9n+5){
+    width: 90%;
+    grid-column: span 1;
+}
+.overlay:nth-child(9n+6){
+    width: 90%;
+    grid-column: span 1;
+}
+.overlay:nth-child(9n+9){
+    width: 90%;
     grid-column: span 1;
 }
 ::-webkit-scrollbar{
@@ -228,7 +241,6 @@ header, footer{
 .game_photo_div{
     color: #ffffff;
     width: 90%;
-    height: 100%;
 }
 .buy-button{
     color: rgba(255,255,255,0.85);
@@ -246,11 +258,6 @@ header, footer{
 }
 .game_ico{
     height: 200px;
-    width: 100%;
-    border-radius: 10px;
-}
-.game_photo_div::nth-of-type(3n+4) img{
-    height: 400px;
     width: 100%;
     border-radius: 10px;
 }
@@ -312,11 +319,78 @@ header, footer{
 .add_game_button{
     text-align: right;
 }
+#alert{
+    position: absolute;
+    left:39.6%;
+    top:15%;
+    width: 400px;
+}
+#alert>.close{
+    padding: 3px 20px;
+    margin-right: 0;
+}
+#alert_for_order{
+    position: absolute;
+    z-index: 200;
+    left: 34.5%;
+    margin-left: auto;
+    margin-bottom: auto;
+    top:35%;
+    height: 200px;
+    width: 600px;
+    text-align: center;
+    font-size: 40px;
+}
+#alert_for_sign_in{
+    position: absolute;
+    top:85.5%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0;
+    text-align: center;
+    border-radius: 0 0 15px 15px;
+}
+#alert_for_sign_up{
+    position: absolute;
+    top: 92.8%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0;
+    text-align: center;
+    border-radius: 0 0 15px 15px;
+    font-size: 13px;
+}
+#alert_for_all_games{
+    position: absolute;
+    top: 12%;
+    left: 42.5%;
+    text-align: center;
+    width: 20%;
+}
+#alert_for_sign_in>.close{
+    padding: 15px 20px;
+    margin-left: 0;
+}
+#alert_for_sign_up>.close{
+    padding: 3px 20px;
+    margin-left: 0;
+}
+#alert_for_order>.close{
+    padding: 0 20px;
+    margin-right: 0;
+}
 .new_game{
     display: flex;
     flex-direction: column;
     margin: 100px auto;
     width: 90%;
+    box-sizing: border-box;
     justify-content: space-between;
 }
 .game_fields{

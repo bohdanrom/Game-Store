@@ -2,7 +2,7 @@
 {% block title %}{{game_details.game_name}}{% endblock %}
 {% block content %}
 <div class="row">
-    <div class="about_game">
+    <div class="about_game_total">
         <div class="row">
             <div class="about_game">
                 <img src="data:image/jpeg;base64,{{ game_image }}" alt="game_img" class="game_photo">
@@ -76,7 +76,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="sub comment_div">
-                                                    <p class="comment_text">{{ sub_comment.text }}</p>
+                                                    <p class="comment_text" id="{{ sub_comment.comment_id }}">{{ sub_comment.text }}</p>
                                                     {% if ((current_user.customer_username == sub_comment.author_username) or (current_user.role_id == 1)) %}
                                                     <div class="crud_comments">
                                                         <p onclick="editComment(commentText=`{{ sub_comment.text }}`, commentId={{ sub_comment.comment_id }})" class="reply edit_comment">Edit</p>
@@ -152,7 +152,6 @@
                 dataType: 'json',
                 contentType: 'application/json',
                 data: String(commentId),
-                
             });
             $(document).ajaxStop(function(){
                 window.location.reload();

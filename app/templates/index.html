@@ -68,7 +68,7 @@
                                                         href="#" onclick="show('block')"
                                                     {% endif %} class="nav-item nav-link user_photo">
                                                     <img height="60" width="60" class="user_ico"
-                                                                {% if user_photo is not none %}
+                                                                {% if user_photo %}
                                                                     src="data:image/jpeg;base64,{{ user_photo }}"
                                                                 {% else %}
                                                                     src="{{ url_for('static', filename='pngegg.png') }}"
@@ -116,6 +116,14 @@
                                                         <input type="password" placeholder="Password" name="user_password" class="input">
                                                         <input type="submit" value="Welcome Home" name="sab" class="input submit">
                                                 </form>
+                                                {% for message in get_flashed_messages() %}
+                                                    <div class="alert alert-danger alert-dismissible show" id='alert_for_sign_in' role="alert">
+                                                        {{ message }}
+                                                        <button type="button" class="close">
+                                                            <span onclick="hideAlert()" aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                {% endfor %}
                                                 <a href="#" onclick="signUp(state='none', state_two='block')" class="login_ref">Still haven't an account?</a>
                                         </div>
                                          <div class="reg_form_new" id="reg_form_new">
@@ -129,16 +137,19 @@
                                                         <input type="password" placeholder="Confirm Password" name="password_two" class="input">
                                                         <input type="submit" value="Join Family" name="sab" class="input submit">
                                                 </form>
+                                                {% for message in get_flashed_messages() %}
+                                                    <div class="alert alert-danger alert-dismissible show" id='alert_for_sign_up' role="alert">
+                                                        {{ message }}
+                                                        <button type="button" class="close">
+                                                            <span onclick="hideAlert()" aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                {% endfor %}
                                                 <a href="#" onclick="signUp(state='block', state_two='none')" class="login_ref">Already a member?</a>
                                         </div>
                         </div>
                 </div>
 		        <div class="container">
-<!--                        {%- for category, message in get_flashed_messages(with_categories = true) %}-->
-<!--                                <div class = "alert">-->
-<!--                                        {{ message }}-->
-<!--                                </div>-->
-<!--                        {%- endfor %}-->
 			            {% block content%}
 			            {% endblock %}
 		        </div>
@@ -186,5 +197,34 @@
             });
         });
     });
+</script>
+<script>
+    function hideAlert(){
+        $('.alert').css("display", "none");
+    }
+</script>
+<script>
+    let getUrlParameter = function getUrlParameter(sParam) {
+    let sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('?'),
+        sParameterName,
+        i;
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] === sParam) {
+            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
+    let modalSignIn = getUrlParameter('showModal');
+    let modalSignUp = getUrlParameter('showModalSignUp');
+    if (modalSignIn){
+        show("block");
+    }
+    else if (modalSignUp){
+        show("block");
+        signUp(state='none', state_two='block');
+    }
 </script>
 </html>

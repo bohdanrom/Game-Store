@@ -4,7 +4,7 @@
 <style>
 .overlay{
     position: relative;
-    margin-right: 20px;
+    height: 286px;
 }
 .game_photo_div{
     width: 100%;
@@ -33,8 +33,6 @@
 .admin_img {
     padding: 20px;
     margin-right: 5px;
-    top: 50%;
-    left: 50%;
 }
 .hover_img:hover{
     transform: scale(1.2);
@@ -72,7 +70,7 @@
                                             <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" alt="game_img" class="game_ico" id="game_ico">
                                         {% else %}
                                         <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
-                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" height="170" alt="game_img" class="game_ico" id="game_ico">
+                                            <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='mark.jpg') }} {% endif %}" alt="game_img" class="game_ico" id="game_ico">
                                         </a>
                                         {% endif %}
                                         {% if current_user.role_id == 1 %}
@@ -129,7 +127,7 @@
                 txtValue = listOfGames.textContent || listOfGames.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
                     game[i].style.display = "";
-                } 
+                }
                 else {
                     game[i].style.display = "none";
                 }

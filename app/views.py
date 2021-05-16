@@ -295,7 +295,7 @@ def signup():
                                                 customer_username=new_user_username,
                                                 customer_email=new_user_login,
                                                 customer_password=hash_password,
-                                                role=models.Roles.query.get(2).role_id)
+                                                role=models.Roles.query.get(2))
                     add_to_db(new_user)
                     session['customer_first_name'] = new_user.customer_first_name
                     session['customer_last_name'] = new_user.customer_last_name
@@ -345,8 +345,9 @@ def order():
                     or \
                     (current_user.is_authenticated and not len(models.CartItem.query.filter_by(
                         cart_id=models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
-                            models.Cart.date.desc()).first()).all())):
+                            models.Cart.date.desc()).first().cart_id).all())):
                 flash('You have no products added in your Shopping Cart', 'danger')
+                return redirect('/order' + '?showAlertOrder=' + 'true')
             else:
                 order_first_name = request.form.get("order_first_name")
                 order_last_name = request.form.get("order_last_name")
@@ -355,7 +356,7 @@ def order():
                 payment_type = request.form.get("payment_type")
                 comment = request.form.get("comment")
                 if not current_user.is_authenticated:
-                    if 'cart' in session:
+                    if 'cart' in session and len(session['cart']):
                         for index, game in enumerate(session['cart_game_id']):
                             game = models.Games.query.get(game)
                             game.quantity_available -= session['cart'][index][1]
@@ -363,8 +364,7 @@ def order():
                         session.pop('cart', None)
                         session.pop('cart_game_id', None)
                         flash('Thank you, we will send the game licenses to the email you wrote in the order form', 'success')
-                        return redirect('/order')
-                    return redirect('/cart')
+                        return redirect('/order' + '?showAlertOrder=' + 'true')
                 elif current_user.is_authenticated:
                     user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
                         models.Cart.date.desc()).first()
@@ -382,7 +382,7 @@ def order():
                                               comment=comment)
                     add_to_db(new_order)
                     flash('Thank you, we will send the game licenses to the email you wrote in the order form', 'success')
-                    return redirect('/order')
+                    return redirect('/order' + '?showAlertOrder=' + 'true')
         return render_template('order.html', user_photo=g.photo, cart_item_count=g.cart)
     return redirect('/')
 
@@ -431,7 +431,7 @@ def ajax_add_to_cart():
                 cart_id = session['cart_game_id'].index(request.json)
                 session['cart'][cart_id][1] += 1
         else:
-            if current_user.role_id != 1:
+            if current_user.role_id == 2:
                 if is_cart_active():
                     user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
                         models.Cart.date.desc()).first()
@@ -512,8 +512,11 @@ def load_users():
             g.user = current_user.get_id()
             g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
             g.cart_id = models.Cart.query.filter_by(customer_id=g.user).order_by(
-                models.Cart.date.desc()).first().cart_id
-            g.cart = len(models.CartItem.query.filter_by(cart_id=g.cart_id).all())
+                models.Cart.date.desc()).first()
+            if g.cart_id.cart_status:
+                g.cart = len(models.CartItem.query.filter_by(cart_id=g.cart_id.cart_id).all())
+            else:
+                g.cart = 0
         except AttributeError:
             g.user = None
             g.photo = None

@@ -56,9 +56,6 @@ header, footer{
 .navbar-nav{
     margin-left: 10px;
 }
-.nav-item{
-    margin-right: 20px;
-}
 .user_ico{
     border-radius: 50%;
 }
@@ -176,7 +173,7 @@ header, footer{
 }
 .all_games{
     display: grid;
-    grid-row-gap: 35px;
+    grid-row-gap: 37px;
     grid-template-columns: repeat(auto-fill, minmax(33.33%, 1fr));
     margin-left: 4%;
     margin-right: 10%;
@@ -330,15 +327,14 @@ header, footer{
     margin-right: 0;
 }
 #alert_for_order{
-    position: absolute;
-    z-index: 200;
-    left: 34.5%;
-    margin-left: auto;
-    margin-bottom: auto;
-    top:35%;
+    margin: auto auto;
+    z-index: 100;
+    position: fixed;
+    top: 35%;
+    left: 35%;
+    text-align: center;
     height: 200px;
     width: 600px;
-    text-align: center;
     font-size: 40px;
 }
 #alert_for_sign_in{
@@ -598,6 +594,17 @@ header, footer{
     border: 1px solid #000000;
     padding: 2px;
 }
+#gray_for_order{
+    background: rgba(1,1,1,0.75);
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: none;
+    z-index: 150;
+    overflow: auto;
+}
 #gray{
     background: rgba(1,1,1,0.75);
     position: fixed;
@@ -835,6 +842,7 @@ div.sub{
     box-sizing: border-box;
 }
 .reply_text_and_author{
+    width: 400px;
     display: flex;
     color: #ffffff;
     justify-content: space-between;

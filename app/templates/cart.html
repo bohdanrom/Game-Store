@@ -47,7 +47,7 @@
                                 <div class="total_price_for_one_cart_item">
                                     <p>Total:</p>
                                     <div class="price_and_dollar">
-                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{% if session['cart'] %} {{ cart_item[0]*cart_item[1] }} {% else %} {{ cart_item.price }} {% endif %}</p>
+                                        <p class="price_for_one" id="price{{ game_detail.game_id }}">{% if session['cart'] %} {{ (cart_item[0]*cart_item[1])|round(2, 'common') }} {% else %} {{ cart_item.price }} {% endif %}</p>
                                         <p>$</p> 
                                     </div>
                                 </div>

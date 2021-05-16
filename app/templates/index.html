@@ -22,10 +22,8 @@
             background: #e60000;
             font-weight: bold;
             font-size: 18px;
-            border-radius: 40%;
-            width: 15px;
-            height: 10px;
-            padding: 1px 4px;
+            border-radius: 50%;
+            padding: 2px 5px;
             color: #ffffff;
     }
     </style>
@@ -204,6 +202,12 @@
     }
 </script>
 <script>
+    function showAlertOrder(state){
+       document.getElementById('alert_for_order').style.display = state;
+       document.getElementById('gray_for_order').style.display = state;
+    }
+</script>
+<script>
     let getUrlParameter = function getUrlParameter(sParam) {
     let sPageURL = window.location.search.substring(1),
         sURLVariables = sPageURL.split('?'),
@@ -219,12 +223,16 @@
 };
     let modalSignIn = getUrlParameter('showModal');
     let modalSignUp = getUrlParameter('showModalSignUp');
+    let alertOrder = getUrlParameter('showAlertOrder');
     if (modalSignIn){
         show("block");
     }
     else if (modalSignUp){
         show("block");
         signUp(state='none', state_two='block');
+    }
+    else if (alertOrder){
+        showAlertOrder("block");
     }
 </script>
 </html>

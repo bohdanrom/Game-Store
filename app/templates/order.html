@@ -8,14 +8,16 @@ Order
         <div class="complete_order">
             <h1 class="complete_order_h1">Completing your order</h1>
         </div>
-        {% for message in get_flashed_messages(with_categories=True) %}
-            <div class="alert alert-{{ message[0] }} alert-dismissible show" id='alert_for_order' role="alert">
-                {{ message[1] }}
-                <button type="button" class="close">
-                    <span onclick="hideAlert()" aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        {% endfor %}
+        <div id="gray_for_order">
+            {% for message in get_flashed_messages(with_categories=True) %}
+                <div class="alert alert-{{ message[0] }} alert-dismissible show" id='alert_for_order' role="alert">
+                    {{ message[1] }}
+                    <button type="button" class="close">
+                        <span onclick="showAlertOrder('none')" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
         <div class="order">
             <form class="order_form" method="post" action="">
                 <div class="field">
@@ -46,15 +48,10 @@ Order
                     <label class="order_label" for="payment_type">Comments(optional)</label>
                 </div>
                 <div class="order_button">
-                    <input type="submit" onclick="orderOverlay(state='block')" class="submit input" value="Order">
+                    <input type="submit" class="submit input" id="orderProceedButton" value="Order">
                 </div>
             </form>
         </div>
     </div>
 </div>
-<script>
-    function orderOverlay(state){
-        document.getElementById('gray').style.display = state;
-    }
-</script>
 {% endblock %}

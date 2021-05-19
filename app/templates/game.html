@@ -39,7 +39,7 @@
         </div>
         <div class="comments">
             <div class="all_comments">
-                {% for comment, ico in game_comments|zip(comment_authors_images) %}
+                {% for comment, ico, comment_date in game_comments|zip(comment_authors_images,game_comments2) %}
                     {% if not comment.parent_id %}
                         <div class="user_comment">
                             <div class="comment_author_image">
@@ -48,7 +48,7 @@
                                     <p class="comment_owner">{{ comment.author_username }}</p>
                                 </div>
                                 <div class="date" style="color: #ffffff">
-                                    <p class="publication_date">{{ comment.timestamp.strftime("%b %d %Y %H:%M") }}</p>
+                                    <p class="publication_date">{{ comment_date }} ago</p>
                                 </div>
                             </div>
                             <div class="comment_div">
@@ -63,7 +63,7 @@
                                             {% endif %}
                                         </div>
                                     {% endif %}
-                                    {% for sub_comment, sub_ico in game_sub_comments|zip(sub_comment_authors_images) %}
+                                    {% for sub_comment, sub_ico, sub_comment_date in game_sub_comments|zip(sub_comment_authors_images, game_sub_comments2) %}
                                         {% if sub_comment.parent_id == comment.comment_id %}
                                             <div class="sub comment_div">
                                                 <div class="comment_author_image">
@@ -72,7 +72,7 @@
                                                         <p class="comment_owner">{{ sub_comment.author_username }}</p>
                                                     </div>
                                                     <div class="date" style="color: #ffffff">
-                                                        <p class="publication_date">{{ sub_comment.timestamp.strftime("%b %d %Y %H:%M") }}</p>
+                                                        <p class="publication_date">{{ sub_comment_date }} ago</p>
                                                     </div>
                                                 </div>
                                                 <div class="sub comment_div">
@@ -112,6 +112,7 @@
                         </div>
                         <div class="comment_input">
                             <form action="" method="post" class="customer_comments">
+                                <input class="cancel_comment_input add_comment_input" type="submit" value="Cancel">
                                 <input type="hidden" name='parent' id="parent_comment" class="parent_comment" value="">
                                 <input type="hidden" name='edit' id="edit_comment" class="parent_comment" value="">
                                 <textarea id="comment" class="comment" maxlength="256" name='comment' placeholder="What do you think about {{ game_details.game_name }}?"></textarea>
@@ -128,7 +129,6 @@
     function closeReply(){
         document.getElementById('input_and_hidden_field').style.display = 'none';
         document.getElementById('parent_comment').value = '';
-
     }
 </script>
 <script>
@@ -144,6 +144,14 @@
             document.getElementById("comment").value = commentText;
             document.getElementById("edit_comment").value = commentId;
         }
+</script>
+<script>
+        $('.cancel_comment_input').on('click', function (){
+           $(this).value('');
+           $(document).ajaxStop(function(){
+                window.location.reload();
+            });
+        });
 </script>
 <script>
         function deleteComment(commentId){

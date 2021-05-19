@@ -1,6 +1,3 @@
-html{
-    scroll-behavior: smooth;
-}
 body{
 	margin: 0;
 	padding: 0;
@@ -331,11 +328,11 @@ header, footer{
     z-index: 100;
     position: fixed;
     top: 35%;
-    left: 35%;
+    left: 45%;
     text-align: center;
-    height: 200px;
-    width: 600px;
-    font-size: 40px;
+    height: 180px;
+    width: 250px;
+    font-size: 20px;
 }
 #alert_for_sign_in{
     position: absolute;
@@ -637,6 +634,7 @@ header, footer{
 }
 .user_names{
     display: block;
+    margin-right: 20px;
 }
 .edit_user{
     margin: 65px auto;
@@ -734,6 +732,10 @@ header, footer{
     color: #ffffff;
     padding: 10px 15px;
     margin-left: 10px;
+}
+.cancel_comment_input{
+    margin-right: 10px;
+    background: #e60000;
 }
 .customer_comments{
     display: flex;
@@ -852,6 +854,9 @@ div.sub{
     padding-top: 4px;
     margin-right: 100px;
 }
+.publication_date{
+    font-size: 12px;
+}
 .comment_for_reply{
     white-space: nowrap;
     max-width: 220px;
@@ -939,4 +944,19 @@ td{
 }
 tbody {
     height: 100px;
+}
+.remember_div{
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 10px auto;
+}
+.remember_label{
+    margin: auto 0;
+}
+.checkbox{
+    margin: auto 0;
+    width: 30px;
+}
+.navbar-nav:nth-child(4){
+    width: 100px;
 }

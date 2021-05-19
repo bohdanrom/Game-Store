@@ -1,7 +1,8 @@
 import base64
-import datetime
+from datetime import datetime, timedelta
 
-from flask import render_template, request, redirect, flash, url_for, session, g
+import humanize
+from flask import render_template, request, redirect, flash, url_for, session, g, make_response
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -50,7 +51,7 @@ def add_to_db(row):
 @app.after_request
 def redirect_to_login_page(response):
     if response.status_code == 401:
-        return redirect(url_for('login') + '?next=' + request.url)
+        return redirect('/' + '?showModal=' + 'true')
     return response
 
 
@@ -117,7 +118,7 @@ def display_game(game_id: int):
                     comment_id = int(request.form.get('edit'))
                     comment_object = models.Comments.query.filter_by(comment_id=comment_id).first()
                     comment_object.text = comment
-                    comment_object.timestamp = datetime.datetime.utcnow()
+                    comment_object.timestamp = datetime.now().replace(microsecond=0)
                     db.session.commit()
                     return redirect(request.url)
                 else:
@@ -129,6 +130,14 @@ def display_game(game_id: int):
         game_comments = models.Comments.query.filter_by(game_id=game_id).order_by(models.Comments.comment_id).all()
         game_sub_comments = models.Comments.query.filter_by(game_id=game_id).filter(
             models.Comments.parent_id != None).order_by(models.Comments.comment_id).all()
+
+        def time_after_comment(list_of_comments):
+            comment_time_ago = []
+            for comment_object in list_of_comments:
+                comment_time_ago.append(humanize.precisedelta(datetime.now().replace(microsecond=0, second=0) - comment_object.timestamp.replace(microsecond=0, second=0)))
+            return comment_time_ago
+        game_sub_comments2 = time_after_comment(game_sub_comments)
+        game_comments2 = time_after_comment(game_comments)
         comments_authors = [models.Customers.query.filter_by(customer_username=comment.author_username).order_by(
             models.Customers.customer_id).first()
                             for comment in game_comments
@@ -162,7 +171,9 @@ def display_game(game_id: int):
                                game_details=game_details,
                                game_image=game_image,
                                game_comments=game_comments,
+                               game_comments2=game_comments2,
                                game_sub_comments=game_sub_comments,
+                               game_sub_comments2=game_sub_comments2,
                                comment_authors_images=comment_authors_images,
                                sub_comment_authors_images=sub_comment_authors_images,
                                user_photo=g.photo,
@@ -250,12 +261,16 @@ def login():
     if request.method == "POST":
         user_login = request.form.get('user_email')
         user_password = request.form.get('user_password')
+        remember = True if request.form.get('remember') else False
         if user_login and user_password:
             user_credentials = models.Customers.query.filter_by(customer_email=user_login).first()
             if user_credentials and check_password_hash(user_credentials.customer_password, user_password):
-                login_user(user_credentials)
-                session['customer_first_name'] = user_credentials.customer_first_name
-                session['customer_last_name'] = user_credentials.customer_last_name
+                # if remember and 'email' not in request.cookies:
+                #     response = make_response(redirect(url_for('display_all_games')))
+                #     response.set_cookie('email', user_login, max_age=60*60*24*7)
+                #     response.set_cookie('pwd', user_password, max_age=60*60*24*7)
+                #     response.set_cookie('rem', 'checked', max_age=60*60*24*7)
+                login_user(user_credentials, remember=remember)
                 return redirect(url_for('display_all_games', user_photo=g.photo))
             flash('Incorrect password')
             return redirect('/' + '?showModal=' + 'true')
@@ -297,9 +312,7 @@ def signup():
                                                 customer_password=hash_password,
                                                 role=models.Roles.query.get(2))
                     add_to_db(new_user)
-                    session['customer_first_name'] = new_user.customer_first_name
-                    session['customer_last_name'] = new_user.customer_last_name
-                    login_user(new_user)
+                    login_user(new_user, remember=False)
                     return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
     return redirect(url_for('display_all_games', user_photo=g.photo, cart_item_count=g.cart))
 
@@ -307,9 +320,9 @@ def signup():
 @app.route('/logout', methods=["POST", "GET"])
 @login_required
 def logout():
-    session.pop('customer_first_name', None)
-    session.pop('customer_last_name', None)
     logout_user()
+    session.pop('cart', None)
+    session.pop('cart_game_id', None)
     return redirect(url_for('display_all_games', cart_item_count=g.cart))
 
 
@@ -327,9 +340,6 @@ def edit_profile():
             if new_user_photo:
                 current_user.customer_photo = new_user_photo
         db.session.commit()
-        session['customer_first_name'] = current_user.customer_first_name
-        session['customer_last_name'] = current_user.customer_last_name
-        session.modified = True
         return redirect(url_for('display_all_games'))
     return render_template('user_profile.html',
                            customer=current_user,
@@ -341,11 +351,14 @@ def edit_profile():
 def order():
     if admin_permission() == 2:
         if request.method == "POST":
-            if (not current_user.is_authenticated and not len(session['cart'])) \
-                    or \
-                    (current_user.is_authenticated and not len(models.CartItem.query.filter_by(
-                        cart_id=models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
-                            models.Cart.date.desc()).first().cart_id).all())):
+            if current_user.is_authenticated:
+                try:
+                    cart = len(models.CartItem.query.filter_by(models.Cart.query.filter_by(
+                        customer_id=current_user.customer_id, cart_status=True).order_by(models.Cart.date.desc()).first().all()))
+                except AttributeError:
+                    cart = None
+
+            if not current_user.is_authenticated and ('cart' not in session or not len(session['cart'])):
                 flash('You have no products added in your Shopping Cart', 'danger')
                 return redirect('/order' + '?showAlertOrder=' + 'true')
             else:
@@ -368,11 +381,16 @@ def order():
                 elif current_user.is_authenticated:
                     user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
                         models.Cart.date.desc()).first()
+                    print(user_cart)
+                    print(user_cart.cart_status)
                     user_cart.cart_status = False
                     user_cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
                     for elem in user_cart_items:
                         game = models.Games.query.get(elem.game_id)
                         game.quantity_available -= elem.amount
+                    if models.Orders.query.filter_by(cart_id=user_cart.cart_id).first():
+                        flash('You have no products added in your Shopping Cart', 'danger')
+                        return redirect('/order' + '?showAlertOrder=' + 'true')
                     new_order = models.Orders(cart_id=user_cart.cart_id,
                                               customer_first_name=order_first_name,
                                               customer_last_name=order_last_name,

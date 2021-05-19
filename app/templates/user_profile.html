@@ -14,8 +14,8 @@ Edit Profile
                         </div>
                         <div class="edt_user">
                                 <form action="/edit_profile" class="user_fields" method="post" enctype="multipart/form-data">
-                                        <input type="text" class="new_profile_detail" id="new_first_name" name="new_first_name" {% if session['customer_first_name'] %} value="{{ session['customer_first_name'] }}" {% endif %}>
-                                        <input type="text" class="new_profile_detail" id="new_last_name" name="new_last_name" {% if session['customer_last_name'] %} value="{{ session['customer_last_name'] }}" {% endif %}>
+                                        <input type="text" class="new_profile_detail" id="new_first_name" name="new_first_name" {% if current_user.is_authenticated %} value="{{ current_user.customer_first_name }}" {% endif %}>
+                                        <input type="text" class="new_profile_detail" id="new_last_name" name="new_last_name" {% if current_user.is_authenticated %} value="{{ current_user.customer_last_name }}" {% endif %}>
                                         <div class="image_and_button">
                                                 <div class="input__wrapper">
                                                         <input type="file" name="new_user_ico" id="input__file" accept="image/*" class="input input__file" multiple>

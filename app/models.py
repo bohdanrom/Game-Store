@@ -98,7 +98,7 @@ class Comments(db.Model):
     text = db.Column(db.String(256))
     game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'))
     author_username = db.Column(db.String(64), db.ForeignKey('customers.customer_username'))
-    timestamp = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
+    timestamp = db.Column(db.DateTime(), default=datetime.now().replace(microsecond=0), index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('comments.comment_id', ondelete='CASCADE'))
     replies = db.relationship('Comments', backref=db.backref('comments', remote_side=[comment_id]), lazy='dynamic', passive_deletes=True)
     author = db.relationship("Customers", backref=db.backref('customers'), uselist=False)
@@ -110,14 +110,14 @@ class Cart(db.Model):
     cart_id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.customer_id'))
     cart_status = db.Column(db.Boolean, default=True)
-    date = db.Column(db.DateTime(), default=datetime.utcnow)
+    date = db.Column(db.DateTime(), default=datetime.now())
     customer = db.relationship("Customers", backref=db.backref('customer'), uselist=False)
 
 
 class Orders(db.Model):
     __tablename__ = 'orders'
     order_id = db.Column(db.Integer, primary_key=True)
-    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id'))
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id'), unique=True)
     customer_first_name = db.Column(db.String(30))
     customer_last_name = db.Column(db.String(30))
     customer_email = db.Column(db.String(128), nullable=False)

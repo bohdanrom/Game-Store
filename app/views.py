@@ -1,8 +1,8 @@
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import humanize
-from flask import render_template, request, redirect, flash, url_for, session, g, make_response
+from flask import render_template, request, redirect, flash, url_for, session, g
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -129,12 +129,14 @@ def display_game(game_id: int):
         game_photo = models.GameImages.query.filter_by(game_id=game_id).first()
         game_comments = models.Comments.query.filter_by(game_id=game_id).order_by(models.Comments.comment_id).all()
         game_sub_comments = models.Comments.query.filter_by(game_id=game_id).filter(
-            models.Comments.parent_id != None).order_by(models.Comments.comment_id).all()
+            models.Comments.parent_id is not None).order_by(models.Comments.comment_id).all()
 
         def time_after_comment(list_of_comments):
             comment_time_ago = []
             for comment_object in list_of_comments:
-                comment_time_ago.append(humanize.precisedelta(datetime.now().replace(microsecond=0, second=0) - comment_object.timestamp.replace(microsecond=0, second=0)))
+                comment_time_ago.append(
+                    humanize.precisedelta(datetime.now().replace(microsecond=0, second=0) -
+                                          comment_object.timestamp.replace(microsecond=0, second=0)))
             return comment_time_ago
         game_sub_comments2 = time_after_comment(game_sub_comments)
         game_comments2 = time_after_comment(game_comments)
@@ -289,7 +291,8 @@ def signup():
         new_user_password = request.form.get('password')
         new_user_password_verification = request.form.get('password_two')
         if not (
-                new_user_first_name or new_user_last_name or new_user_login or new_user_password or new_user_password_verification):
+                new_user_first_name or new_user_last_name or new_user_login or new_user_password or
+                new_user_password_verification):
             flash('Please, fill all the fields')
             return redirect('/' + '?showModalSignUp=' + 'true')
         elif new_user_password != new_user_password_verification:
@@ -351,13 +354,6 @@ def edit_profile():
 def order():
     if admin_permission() == 2:
         if request.method == "POST":
-            if current_user.is_authenticated:
-                try:
-                    cart = len(models.CartItem.query.filter_by(models.Cart.query.filter_by(
-                        customer_id=current_user.customer_id, cart_status=True).order_by(models.Cart.date.desc()).first().all()))
-                except AttributeError:
-                    cart = None
-
             if not current_user.is_authenticated and ('cart' not in session or not len(session['cart'])):
                 flash('You have no products added in your Shopping Cart', 'danger')
                 return redirect('/order' + '?showAlertOrder=' + 'true')
@@ -376,13 +372,12 @@ def order():
                         db.session.commit()
                         session.pop('cart', None)
                         session.pop('cart_game_id', None)
-                        flash('Thank you, we will send the game licenses to the email you wrote in the order form', 'success')
+                        flash('Thank you, we will send the game licenses to the email you wrote in the order form',
+                              'success')
                         return redirect('/order' + '?showAlertOrder=' + 'true')
                 elif current_user.is_authenticated:
                     user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
                         models.Cart.date.desc()).first()
-                    print(user_cart)
-                    print(user_cart.cart_status)
                     user_cart.cart_status = False
                     user_cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
                     for elem in user_cart_items:
@@ -399,7 +394,8 @@ def order():
                                               payment_type=payment_type,
                                               comment=comment)
                     add_to_db(new_order)
-                    flash('Thank you, we will send the game licenses to the email you wrote in the order form', 'success')
+                    flash('Thank you, we will send the game licenses to the email you wrote in the order form',
+                          'success')
                     return redirect('/order' + '?showAlertOrder=' + 'true')
         return render_template('order.html', user_photo=g.photo, cart_item_count=g.cart)
     return redirect('/')
@@ -514,6 +510,29 @@ def ajax_delete_cart_item():
             db.session.commit()
     return str(len(session['cart'])) if not current_user.is_authenticated \
         else str(len(models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()))
+
+
+@app.route('/all_customers')
+@login_required
+def display_customers():
+    g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
+    if admin_permission() == 1:
+        customers = models.Customers.query.order_by(models.Customers.customer_id).all()
+        return render_template('users_list.html', customers=customers, cart_item_count=g.cart, user_photo=g.photo)
+    return redirect('/')
+
+
+@app.route('/change_role', methods=["POST"])
+@login_required
+def ajax_change_role():
+    if admin_permission() == 1:
+        user = models.Customers.query.get(request.json)
+        if user.role_id == 1:
+            user.role_id = 2
+        elif user.role_id == 2:
+            user.role_id = 1
+        db.session.commit()
+        return str(user.role_id)
 
 
 @manager.user_loader

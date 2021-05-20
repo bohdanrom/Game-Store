@@ -34,7 +34,7 @@ Edit Profile
         </div>
 <script>
     let file = document.getElementById('input__file');
-    file.onchange = function(e) {
+    file.onchange = function() {
         let ext = this.value.match(/\.([^\.]+)$/)[1];
             switch (ext) {
                 case 'jpg':

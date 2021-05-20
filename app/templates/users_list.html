@@ -1,0 +1,70 @@
+{% extends 'index.html' %}
+{% block title %}
+    User List
+{% endblock %}
+{% block content %}
+<div class="row">
+    <table class="users">
+        <thead class="customer_table_header">
+            <tr class="customer_table_row">
+                <th class="customer_header">Username</th>
+                <th class="customer_header">First Name</th>
+                <th class="customer_header">Last Name</th>
+                <th class="customer_header">Email</th>
+                <th class="customer_header">Role</th>
+                <th class="customer_header">Change Role</th>
+            </tr>
+        </thead>
+        <tbody class="customer_table_body">
+            {% for user in customers %}
+                <tr class="customer_table_row">
+                   <td class="customer_cell">{{ user.customer_username }}</td>
+                   <td class="customer_cell">{{ user.customer_first_name }}</td>
+                   <td class="customer_cell">{{ user.customer_last_name }}</td>
+                   <td class="customer_cell">{{ user.customer_email }}</td>
+                   <td class="customer_cell" id="user{{ user.customer_id }}">
+                       {% if user.role_id == 1 %}
+                           Admin
+                       {% elif user.role_id %}
+                           User
+                       {% endif %}
+                   </td>
+                   <td class="customer_cell" style="background: #f56c16">
+                       <button class="add_role" id="{{ user.customer_id }}">Give
+                           {% if user.role_id == 1 %}
+                               user
+                           {% elif user.role_id %}
+                               admin
+                           {% endif %}
+                            role
+                       </button>
+                   </td>
+                </tr>
+                <tr class="empty_table_row"><td> </td></tr>
+            {% endfor %}
+      </tbody>
+   </table>
+</div>
+<script>
+    $('.add_role').on('click', function (){
+        customerId = $(this).attr('id');
+        $.ajax({
+            url: '{{ url_for('ajax_change_role') }}',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: String(customerId),
+            success: function (roleId){
+                if (roleId === 1){
+                    $('#user'+customerId).text('Admin');
+                    $('#'+customerId).text('Give user role');
+                }
+                else if (roleId === 2) {
+                    $('#user'+customerId).text('User')
+                    $('#'+customerId).text('Give admin role');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

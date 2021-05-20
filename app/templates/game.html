@@ -106,13 +106,13 @@
                                     <p class="comment_for_reply" id="comment_for_reply"></p>
                                 </div>
                                 <div class="reply_close">
-                                    <img src="{{ url_for('static', filename='close.png')}}" onclick="closeReply()" class='cancelReply' id='cancelReply'>
+                                    <img src="{{ url_for('static', filename='close.png')}}" onclick="closeReply()" alt="closeReplyBlock" class='cancelReply' id='cancelReply'>
                                 </div>
                             </div>
                         </div>
                         <div class="comment_input">
                             <form action="" method="post" class="customer_comments">
-                                <input class="cancel_comment_input add_comment_input" type="submit" value="Cancel">
+                                <input class="cancel_comment_input add_comment_input" type="button" value="Cancel">
                                 <input type="hidden" name='parent' id="parent_comment" class="parent_comment" value="">
                                 <input type="hidden" name='edit' id="edit_comment" class="parent_comment" value="">
                                 <textarea id="comment" class="comment" maxlength="256" name='comment' placeholder="What do you think about {{ game_details.game_name }}?"></textarea>
@@ -147,10 +147,10 @@
 </script>
 <script>
         $('.cancel_comment_input').on('click', function (){
-           $(this).value('');
-           $(document).ajaxStop(function(){
-                window.location.reload();
-            });
+           if (document.getElementById('input_and_hidden_field').style.display === 'block'){
+               closeReply()
+           }
+           document.getElementById("comment").value = ''
         });
 </script>
 <script>
@@ -165,6 +165,6 @@
             $(document).ajaxStop(function(){
                 window.location.reload();
             });
-        };
+        }
 </script>
 {% endblock %}

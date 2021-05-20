@@ -89,8 +89,8 @@
                                                 </p>
 				                        </div>
                                         <div class="navbar-nav">
-                                                <a {% if current_user.role_id == 1 %} href="{{ url_for('display_all_games')}}" {% else %} href="{{ url_for('cart')}}" {% endif %} class="nav-item nav-link">
-                                                    <img height="20" src="{{ url_for('static', filename='pngaaa.com-3531796.png') }}" alt="Cart">
+                                                <a {% if current_user.role_id == 1 %} href="{{ url_for('display_customers')}}" {% else %} href="{{ url_for('cart')}}" {% endif %} class="nav-item nav-link">
+                                                    <img alt="Cart" {% if current_user.role_id == 1 %} height="40" src="{{ url_for('static', filename='PinClipart.com_mason-jar-fireflies-clipart_2864909.png') }}" {% else %} height="20" src="{{ url_for('static', filename='pngaaa.com-3531796.png') }}" {% endif %} alt="Cart">
                                                     <span class="total-count">{{ cart_item_count }}</span>
                                                 </a>
                                         </div>

@@ -59,19 +59,19 @@ class GameGenres(db.Model):
 class Roles(db.Model):
     __tablename__ = 'roles'
     role_id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(32), unique=True)
 
 
 class Customers(db.Model, UserMixin):
     __tablename__ = 'customers'
     customer_id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.role_id', ondelete="CASCADE"))
-    customer_email = db.Column(db.String(128), unique=True, nullable=False)
+    customer_email = db.Column(db.String(64), unique=True, nullable=False)
     customer_password = db.Column(db.String(128), nullable=False)
-    customer_username = db.Column(db.String(64),nullable=False, unique=True)
+    customer_username = db.Column(db.String(64), nullable=False, unique=True)
     customer_photo = db.Column(db.LargeBinary)
-    customer_first_name = db.Column(db.String(30))
-    customer_last_name = db.Column(db.String(30))
+    customer_first_name = db.Column(db.String(16))
+    customer_last_name = db.Column(db.String(16))
     role = db.relationship("Roles", backref=db.backref('roles'), uselist=False, passive_deletes=True)
 
     def is_authenticated(self):
@@ -84,7 +84,7 @@ class Customers(db.Model, UserMixin):
         return False
 
     def get_id(self):
-        return (self.customer_id)
+        return self.customer_id
 
 
 @manager.user_loader
@@ -100,7 +100,8 @@ class Comments(db.Model):
     author_username = db.Column(db.String(64), db.ForeignKey('customers.customer_username'))
     timestamp = db.Column(db.DateTime(), default=datetime.now().replace(microsecond=0), index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('comments.comment_id', ondelete='CASCADE'))
-    replies = db.relationship('Comments', backref=db.backref('comments', remote_side=[comment_id]), lazy='dynamic', passive_deletes=True)
+    replies = db.relationship('Comments', backref=db.backref('comments', remote_side=[comment_id]), lazy='dynamic',
+                              passive_deletes=True)
     author = db.relationship("Customers", backref=db.backref('customers'), uselist=False)
     game = db.relationship("Games", backref=db.backref('game'), uselist=False)
 
@@ -120,9 +121,9 @@ class Orders(db.Model):
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id'), unique=True)
     customer_first_name = db.Column(db.String(30))
     customer_last_name = db.Column(db.String(30))
-    customer_email = db.Column(db.String(128), nullable=False)
-    customer_phone = db.Column(db.String(20))
-    payment_type = db.Column(db.String(64))
+    customer_email = db.Column(db.String(64), nullable=False)
+    customer_phone = db.Column(db.String(15))
+    payment_type = db.Column(db.String(32))
     comment = db.Column(db.String(256))
     cart = db.relationship("Cart", backref=db.backref('cart'), uselist=False)
 

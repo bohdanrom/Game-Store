@@ -9,7 +9,7 @@ Edit Profile
                             <img {% if user_photo is not none %}
                                         src="data:image/jpeg;base64,{{ user_photo }}"
                                  {% else %}
-                                        src="{{ url_for('static', filename='pngegg.png') }}"
+                                        src="{{ url_for('static', filename='images/pngegg.png') }}"
                                  {% endif %} alt="user_photo" class="user_edit_photo" height="250">
                         </div>
                         <div class="edt_user">
@@ -20,7 +20,7 @@ Edit Profile
                                                 <div class="input__wrapper">
                                                         <input type="file" name="new_user_ico" id="input__file" accept="image/*" class="input input__file" multiple>
                                                                 <label for="input__file" class="input__file-button">
-                                                                        <span class="input__file-icon-wrapper"><img class="input__file-icon" src="{{ url_for('static', filename='kisspng_computer_icons_logo_download_incoming_5b2fe3dddadc97_07.png')}}" alt="Choose profile image" width="30"></span>
+                                                                        <span class="input__file-icon-wrapper"><img class="input__file-icon" src="{{ url_for('static', filename='images/kisspng_computer_icons_logo_download_incoming_5b2fe3dddadc97_07.png')}}" alt="Choose profile image" width="30"></span>
                                                                         <span class="input__file-button-text">Choose profile image</span>
                                                                 </label>
                                                 </div>

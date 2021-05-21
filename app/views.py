@@ -1,12 +1,15 @@
 import base64
+import json
+import threading
 from datetime import datetime
 
 import humanize
+from flask_mail import Message
 from flask import render_template, request, redirect, flash, url_for, session, g
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 
-from app import app, db, models, manager
+from app import app, db, models, manager, mail
 
 
 def return_genres():
@@ -48,6 +51,16 @@ def add_to_db(row):
     db.session.commit()
 
 
+@app.route('/email')
+def send_mail(*args):
+    # msg = Message('Order', recipients=[args[0]])
+    with open('static/images/thank_u2.png', 'rb') as photo_for_email:
+        thank_you_image = photo_for_email.read()
+    # msg.html = render_template('email.html', thank_you_image=thank_you_image, link=link)
+    # mail.send(msg)
+    return render_template('email.html', thank_you_image=convert_image_from_binary_to_unicode(thank_you_image))
+
+
 @app.after_request
 def redirect_to_login_page(response):
     if response.status_code == 401:
@@ -83,7 +96,7 @@ def add_new_game():
                 new_game.genres.append(genre)
         add_to_db(new_game)
         if not game_image:
-            with open('./static/mark_edited2.png', 'rb') as default_photo:
+            with open('static/images/mark_edited2.png', 'rb') as default_photo:
                 game_image = default_photo.read()
         new_game_image = models.GameImages(game_id=new_game.game_id,
                                            game_photo=game_image)
@@ -155,7 +168,7 @@ def display_game(game_id: int):
                 if author.customer_photo is not None:
                     comment_author_images.append(base64.b64encode(author.customer_photo).decode("utf-8"))
                 else:
-                    with open('./static/pngegg.png', 'rb') as default_photo:
+                    with open('static/images/pngegg.png', 'rb') as default_photo:
                         comment_author_images.append(base64.b64encode(default_photo.read()).decode("utf-8"))
             return comment_author_images
 
@@ -263,16 +276,10 @@ def login():
     if request.method == "POST":
         user_login = request.form.get('user_email')
         user_password = request.form.get('user_password')
-        remember = True if request.form.get('remember') else False
         if user_login and user_password:
             user_credentials = models.Customers.query.filter_by(customer_email=user_login).first()
             if user_credentials and check_password_hash(user_credentials.customer_password, user_password):
-                # if remember and 'email' not in request.cookies:
-                #     response = make_response(redirect(url_for('display_all_games')))
-                #     response.set_cookie('email', user_login, max_age=60*60*24*7)
-                #     response.set_cookie('pwd', user_password, max_age=60*60*24*7)
-                #     response.set_cookie('rem', 'checked', max_age=60*60*24*7)
-                login_user(user_credentials, remember=remember)
+                login_user(user_credentials)
                 return redirect(url_for('display_all_games', user_photo=g.photo))
             flash('Incorrect password')
             return redirect('/' + '?showModal=' + 'true')
@@ -374,6 +381,7 @@ def order():
                         session.pop('cart_game_id', None)
                         flash('Thank you, we will send the game licenses to the email you wrote in the order form',
                               'success')
+                        send_mail(order_email, order_first_name, order_last_name, order_phone, payment_type)
                         return redirect('/order' + '?showAlertOrder=' + 'true')
                 elif current_user.is_authenticated:
                     user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
@@ -518,21 +526,22 @@ def display_customers():
     g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
     if admin_permission() == 1:
         customers = models.Customers.query.order_by(models.Customers.customer_id).all()
-        return render_template('users_list.html', customers=customers, cart_item_count=g.cart, user_photo=g.photo)
+        roles = models.Roles.query.all()
+        return render_template('users_list.html', customers=customers, roles=roles, cart_item_count=g.cart, user_photo=g.photo)
     return redirect('/')
 
 
 @app.route('/change_role', methods=["POST"])
 @login_required
 def ajax_change_role():
+    role_id = request.json.get('roleId')
+    customer_id = request.json.get('customerId')
     if admin_permission() == 1:
-        user = models.Customers.query.get(request.json)
-        if user.role_id == 1:
-            user.role_id = 2
-        elif user.role_id == 2:
-            user.role_id = 1
+        user = models.Customers.query.get(customer_id)
+        role_name = models.Roles.query.get(role_id).name
+        user.role_id = role_id
         db.session.commit()
-        return str(user.role_id)
+        return json.dumps(role_name)
 
 
 @manager.user_loader

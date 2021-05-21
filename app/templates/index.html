@@ -9,7 +9,7 @@
         <meta property="og:title" content="The best online game store with the lowest prices"/>
         <meta property="og:description" content="Game store"/>
         <meta name="author" content="Bohdan Romanytsia">
-        <link rel="icon" type="image/png" href="{{url_for('static', filename='ri2759.ico')}}">
+        <link rel="icon" type="image/png" href="{{url_for('static', filename='images/ri2759.ico')}}">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" crossorigin="anonymous"></script>
@@ -40,7 +40,7 @@
 				                <nav class="navbar navbar-expand-sm navbar-dark">
 					                    <div class="logo-and-text">
 						                        <a class="navbar-brand" href="{{ url_for('display_all_games') }}">
-								                        <img src="{{url_for('static', filename='ri2759.ico')}}" height="80" class="d-inline-block align-top" alt="Game-store-logo">
+								                        <img src="{{url_for('static', filename='images/ri2759.ico')}}" height="80" class="d-inline-block align-top" alt="Game-store-logo">
 						                        </a>
 						                        <p class="logo-text">Game store</p>
 					                    </div>
@@ -69,7 +69,7 @@
                                                                 {% if user_photo %}
                                                                     src="data:image/jpeg;base64,{{ user_photo }}"
                                                                 {% else %}
-                                                                    src="{{ url_for('static', filename='pngegg.png') }}"
+                                                                    src="{{ url_for('static', filename='images/pngegg.png') }}"
                                                                 {% endif %}
                                                          alt="Login-SignUp">
                                                 </a>
@@ -90,13 +90,13 @@
 				                        </div>
                                         <div class="navbar-nav">
                                                 <a {% if current_user.role_id == 1 %} href="{{ url_for('display_customers')}}" {% else %} href="{{ url_for('cart')}}" {% endif %} class="nav-item nav-link">
-                                                    <img alt="Cart" {% if current_user.role_id == 1 %} height="40" src="{{ url_for('static', filename='PinClipart.com_mason-jar-fireflies-clipart_2864909.png') }}" {% else %} height="20" src="{{ url_for('static', filename='pngaaa.com-3531796.png') }}" {% endif %} alt="Cart">
+                                                    <img alt="Cart" {% if current_user.role_id == 1 %} height="40" src="{{ url_for('static', filename='images/PinClipart.com_mason-jar-fireflies-clipart_2864909.png') }}" {% else %} height="20" src="{{ url_for('static', filename='images/pngaaa.com-3531796.png') }}" {% endif %} alt="Cart">
                                                     <span class="total-count">{{ cart_item_count }}</span>
                                                 </a>
                                         </div>
                                         <div class="navbar-nav">
                                                 <a href="{{ url_for('logout') }}" class="nav-item nav-link">
-                                                    <img height="20" src="{{ url_for('static', filename='iconfinder_login_account_enter_door_3005767.png') }}" alt="Logout">
+                                                    <img height="20" src="{{ url_for('static', filename='images/iconfinder_login_account_enter_door_3005767.png') }}" alt="Logout">
                                                 </a>
                                         </div>
 				                </nav>
@@ -106,7 +106,7 @@
 	    <section class="main">
                 <div id="gray">
                         <div id="modal">
-                                <img src="{{ url_for('static', filename='close.png')}}" alt="" onclick="show('none')" class="close">
+                                <img src="{{ url_for('static', filename='images/close.png')}}" alt="" onclick="show('none')" class="close">
                                         <div class="reg_form" id="reg_form">
                                                 <h2>Sign In</h2>
                                                 <form action="/login" name="f1" method="post" class="register">
@@ -162,7 +162,7 @@
 				                <nav class="navbar navbar-expand-sm navbar-dark">
 					                    <div class="logo-and-text">
 						                        <a href="{{ url_for('display_all_games') }}" class="navbar-brand">
-						        	                    <img src="{{ url_for('static', filename='ri2759.ico')}}" height="80" class="d-inline-block align-top" alt="Game-store-logo">
+						        	                    <img src="{{ url_for('static', filename='images/ri2759.ico')}}" height="80" class="d-inline-block align-top" alt="Game-store-logo">
 						                        </a>
 						                        <p class="logo-text">Game store</p>
 					                    </div>

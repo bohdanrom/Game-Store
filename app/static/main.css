@@ -989,7 +989,7 @@ tbody {
     color: #ffffff;
 }
 .users{
-    margin: 147px 0 150px 4.5%;
+    margin: 133px 0 134px 4.5%;
 }
 .customer_table_body{
     height: 645px;
@@ -1001,4 +1001,6 @@ tbody {
 .add_role{
     background: #f56c16;
     border: none;
+    outline: none;
+    width: 100%;
 }

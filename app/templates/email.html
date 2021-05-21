@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+    }
+    table{
+        border: none;
+        text-align: left;
+        font-size: 20px;
+        color: #ffffff;
+        width: 100%;
+    }
+    .total_price, .customer{
+        color: rgba(69,252,142,0.8435749299719888);
+    }
+    .email_footer{
+        background: rgb(117,156,22);
+        background: linear-gradient(172deg, rgba(117,156,22,0.5522584033613445) 0%, rgba(195,253,29,0.6643032212885154) 47%, rgba(69,252,142,0.8435749299719888) 100%);
+    }
+    .price_for_one{
+        color: rgb(30,226,197);
+    }
+</style>
+</head>
+<body>
+    <table cellpadding="0" cellspacing="0" bgcolor="#000000" style="margin:0 auto">
+        <tr>
+            <td align="center" style="padding: 40px 0 30px 0;">
+                <img src="data:image/jpeg;base64, {{ thank_you_image }}" alt="Creating Email Magic" width="600" height="300" style="display: block;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#000000" style="padding: 40px 30px 40px 30px;">
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="margin: 50px auto; text-align: left">
+                            Hello <span class="customer">{{ customer_first_name }} {{ customer_last_name }}</span>, thank you for choosing us.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="20"> </td>
+                    </tr>
+                    <tr>
+                        <td style="margin: 20px auto; text-align: left">
+                            Order details:
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 20px 0 30px 0; margin: 0 auto; text-align: left">
+                            <table cellpadding="0" cellspacing="0">
+                                {% for game in cart_items %}
+                                    <tr style="font-size: 20px;">
+                                        <td width="30%">
+                                            {{ game[2] }}
+                                        </td>
+                                        <td width="15%">
+                                            {{ game[1] }} {% if game[1] == 1 %} copy {% else %} copies {% endif %}
+                                        </td>
+                                        <td width="20%">
+                                            total price: <span class="price_for_one">{{ (game[0]*game[1])|round(2, 'common') }}</span>$
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td height="20"> </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="20px"> </td>
+                    </tr>
+                    <tr>
+                        <td style="margin: 50px auto; text-align: left">
+                            We will call you at the number you wrote in the order form: {{ customer_phone }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="20px"> </td>
+                    </tr>
+                    <tr>
+                        <td style="margin: 50px auto; text-align: left">
+                            Total price: <span style="font-size: 40px;" class="total_price">{{ total_price|round(2, 'common') }}</span>$
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="email_footer">
+                <p>Thank you!!!</p>
+                <p>Any questions?</p>
+                <p>Bohdan.Romanytsia.KB.2019@lpnu.ua</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

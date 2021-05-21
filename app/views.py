@@ -51,14 +51,18 @@ def add_to_db(row):
     db.session.commit()
 
 
-@app.route('/email')
-def send_mail(*args):
-    # msg = Message('Order', recipients=[args[0]])
-    with open('static/images/thank_u2.png', 'rb') as photo_for_email:
+def send_mail(*args, **kwargs):
+    msg = Message(f'Order for {args[1]} {args[2]} from game store', recipients=[args[0]])
+    with open('static/images/thank_u.png', 'rb') as photo_for_email:
         thank_you_image = photo_for_email.read()
-    # msg.html = render_template('email.html', thank_you_image=thank_you_image, link=link)
-    # mail.send(msg)
-    return render_template('email.html', thank_you_image=convert_image_from_binary_to_unicode(thank_you_image))
+    msg.html = render_template('email.html',
+                           thank_you_image=convert_image_from_binary_to_unicode(thank_you_image),
+                           customer_first_name=args[1],
+                           customer_last_name=args[2],
+                           customer_phone=args[3],
+                           total_price=sum(map(lambda price: price[0]*price[1], kwargs.get('order_list'))),
+                           cart_items=kwargs.get('order_list'))
+    mail.send(msg)
 
 
 @app.after_request
@@ -377,20 +381,27 @@ def order():
                             game = models.Games.query.get(game)
                             game.quantity_available -= session['cart'][index][1]
                         db.session.commit()
-                        session.pop('cart', None)
-                        session.pop('cart_game_id', None)
                         flash('Thank you, we will send the game licenses to the email you wrote in the order form',
                               'success')
-                        send_mail(order_email, order_first_name, order_last_name, order_phone, payment_type)
+                        t = threading.Thread(target=send_mail,
+                                             args=(order_email, order_first_name, order_last_name, order_phone),
+                                             kwargs={'order_list': session['cart']})
+                        t.run()
+                        session.pop('cart', None)
+                        session.pop('cart_game_id', None)
+                        # flash('Thank you, we will send the game licenses to the email you wrote in the order form',
+                        #       'success')
                         return redirect('/order' + '?showAlertOrder=' + 'true')
                 elif current_user.is_authenticated:
                     user_cart = models.Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
                         models.Cart.date.desc()).first()
                     user_cart.cart_status = False
                     user_cart_items = models.CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
+                    order_list = []
                     for elem in user_cart_items:
                         game = models.Games.query.get(elem.game_id)
                         game.quantity_available -= elem.amount
+                        order_list.append((float(game.price), elem.amount, game.game_name))
                     if models.Orders.query.filter_by(cart_id=user_cart.cart_id).first():
                         flash('You have no products added in your Shopping Cart', 'danger')
                         return redirect('/order' + '?showAlertOrder=' + 'true')
@@ -402,6 +413,10 @@ def order():
                                               payment_type=payment_type,
                                               comment=comment)
                     add_to_db(new_order)
+                    t = threading.Thread(target=send_mail,
+                                         args=(order_email, order_first_name, order_last_name, order_phone),
+                                         kwargs={'order_list': order_list})
+                    t.run()
                     flash('Thank you, we will send the game licenses to the email you wrote in the order form',
                           'success')
                     return redirect('/order' + '?showAlertOrder=' + 'true')
@@ -447,7 +462,7 @@ def ajax_add_to_cart():
         game = models.Games.query.get(int(request.json))
         if not current_user.is_authenticated:
             if request.json not in session['cart_game_id']:
-                session['cart'].append([float(game.price), 1])
+                session['cart'].append([float(game.price), 1, game.game_name])
                 session['cart_game_id'].append(request.json)
             else:
                 cart_id = session['cart_game_id'].index(request.json)

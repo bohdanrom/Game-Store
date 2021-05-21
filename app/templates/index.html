@@ -14,39 +14,39 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" crossorigin="anonymous"></script>
         <title>{% block title %}{% endblock %}</title>
+        {% if current_user.role_id != 1 %}
+            <style>
+                .total-count{
+                    background: #e60000;
+                    font-weight: bold;
+                    font-size: 18px;
+                    border-radius: 50%;
+                    padding: 2px 5px;
+                    color: #ffffff;
+            }
+            </style>
+        {% else %}
+            <style>
+                .total-count{
+                    display: none;
+                }
+            </style>
+{% endif %}
 </head>
 <body>
-{% if current_user.role_id != 1 %}
-    <style>
-        .total-count{
-            background: #e60000;
-            font-weight: bold;
-            font-size: 18px;
-            border-radius: 50%;
-            padding: 2px 5px;
-            color: #ffffff;
-    }
-    </style>
-{% else %}
-    <style>
-        .total-count{
-            display: none;    
-        }
-    </style>
-{% endif %}
-	    <header id="header" class="header">
-		        <div class="container">
-			            <div class="row">
-				                <nav class="navbar navbar-expand-sm navbar-dark">
-					                    <div class="logo-and-text">
-						                        <a class="navbar-brand" href="{{ url_for('display_all_games') }}">
-								                        <img src="{{url_for('static', filename='images/ri2759.ico')}}" height="80" class="d-inline-block align-top" alt="Game-store-logo">
-						                        </a>
-						                        <p class="logo-text">Game store</p>
-					                    </div>
-				                        <ul class="navbar-nav ml-auto">
-		  			                            <li class="nav-item">
-						                                <a class="nav-link" href="{{ url_for('display_all_games') }}">Games</a>
+        <header id="header" class="header">
+                <div class="container">
+                        <div class="row">
+                                <nav class="navbar navbar-expand-sm navbar-dark">
+                                        <div class="logo-and-text">
+                                                <a class="navbar-brand" href="{{ url_for('display_all_games') }}">
+                                                        <img src="{{url_for('static', filename='images/ri2759.ico')}}" height="80" class="d-inline-block align-top" alt="Game-store-logo">
+                                                </a>
+                                                <p class="logo-text">Game store</p>
+                                        </div>
+                                        <ul class="navbar-nav ml-auto">
+                                                <li class="nav-item">
+                                                        <a class="nav-link" href="{{ url_for('display_all_games') }}">Games</a>
                                                 </li>
                                                 <li class="nav-item">
                                                         <a class="nav-link" href="#">Community</a>
@@ -57,9 +57,9 @@
                                                 <li class="nav-item">
                                                         <a class="nav-link" href="#">Support</a>
                                                 </li>
-			                        	</ul>
-				                        <div class="navbar-nav">
-					                            <a
+                                        </ul>
+                                        <div class="navbar-nav">
+                                                <a
                                                     {% if current_user.is_authenticated %}
                                                         href="{{ url_for('edit_profile') }}"
                                                     {% else %}
@@ -73,21 +73,21 @@
                                                                 {% endif %}
                                                          alt="Login-SignUp">
                                                 </a>
-				                        </div>
+                                        </div>
                                         <div class="navbar-nav user_names">
-					                            <p class="user_first_name">
+                                                <p class="user_first_name">
                                                     {% if current_user.is_authenticated %}
                                                         {{ current_user.customer_first_name }}
                                                     {% else %}
                                                     {% endif %}
                                                 </p>
-					                            <p class="user_last_name">
+                                                <p class="user_last_name">
                                                     {% if current_user.is_authenticated %}
                                                         {{ current_user.customer_last_name }}
                                                     {% else %}
                                                     {% endif %}
                                                 </p>
-				                        </div>
+                                        </div>
                                         <div class="navbar-nav">
                                                 <a {% if current_user.role_id == 1 %} href="{{ url_for('display_customers')}}" {% else %} href="{{ url_for('cart')}}" {% endif %} class="nav-item nav-link">
                                                     <img alt="Cart" {% if current_user.role_id == 1 %} height="40" src="{{ url_for('static', filename='images/PinClipart.com_mason-jar-fireflies-clipart_2864909.png') }}" {% else %} height="20" src="{{ url_for('static', filename='images/pngaaa.com-3531796.png') }}" {% endif %} alt="Cart">
@@ -99,9 +99,9 @@
                                                     <img height="20" src="{{ url_for('static', filename='images/iconfinder_login_account_enter_door_3005767.png') }}" alt="Logout">
                                                 </a>
                                         </div>
-				                </nav>
-			            </div>
-		        </div>
+                                </nav>
+                        </div>
+                </div>
 	    </header>
 	    <section class="main">
                 <div id="gray">

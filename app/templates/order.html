@@ -33,7 +33,7 @@ Order
                     <label class="order_label" for="order_email">Email</label>
                 </div>
                 <div class="field">
-                    <input type="text" id="order_phone" class="order_input" name="order_phone" placeholder="In format +380679953365" pattern=^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$ required>
+                    <input type="tel" id="order_phone" class="order_input" name="order_phone" placeholder="In format +380679953365" pattern=^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$ required>
                     <label class="order_label" for="order_phone">Phone</label>
                 </div>
                 <div class="field">
@@ -47,6 +47,7 @@ Order
                     <textarea name="comment" class="order_input" id="order_input"></textarea>
                     <label class="order_label" for="payment_type">Comments(optional)</label>
                 </div>
+                <input type="hidden" id="totalPriceFromCartToOrder" name="totalPriceFromCartToOrder">
                 <div class="order_button">
                     <input type="submit" class="submit input" id="orderProceedButton" value="Order">
                 </div>

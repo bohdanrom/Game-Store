@@ -49,7 +49,7 @@
         customerId = $(this).attr('id');
         roleId = $(this).val();
         $.ajax({
-            url: '{{ url_for('ajax_change_role') }}',
+            url: '{{ url_for('admin.ajax_change_role') }}',
             type: 'post',
             dataType: 'json',
             contentType: 'application/json',

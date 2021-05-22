@@ -9,7 +9,7 @@
 {% block content %}
         <div class="row">
                 <div class="new_game">
-                        <form {% if game %} action="{{ url_for('edit_game', game_id=game.game_id)}}" {% else %} action="{{ url_for('add_new_game') }}" {% endif %} class="game_fields" method="post" enctype="multipart/form-data">
+                        <form {% if game %} action="{{ url_for('admin.edit_game', game_id=game.game_id)}}" {% else %} action="{{ url_for('admin.add_new_game') }}" {% endif %} class="game_fields" method="post" enctype="multipart/form-data">
                                 {% for message in get_flashed_messages() %}
                                     <div class="alert alert-danger alert-dismissible show" id='alert' name='alert' role="alert">
                                         {{ message }}

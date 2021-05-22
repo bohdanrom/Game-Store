@@ -39,14 +39,14 @@
                         <div class="row">
                                 <nav class="navbar navbar-expand-sm navbar-dark">
                                         <div class="logo-and-text">
-                                                <a class="navbar-brand" href="{{ url_for('display_all_games') }}">
+                                                <a class="navbar-brand" href="{{ url_for('customer_sites.display_all_games') }}">
                                                         <img src="{{url_for('static', filename='images/ri2759.ico')}}" height="80" class="d-inline-block align-top" alt="Game-store-logo">
                                                 </a>
                                                 <p class="logo-text">Game store</p>
                                         </div>
                                         <ul class="navbar-nav ml-auto">
                                                 <li class="nav-item">
-                                                        <a class="nav-link" href="{{ url_for('display_all_games') }}">Games</a>
+                                                        <a class="nav-link" href="{{ url_for('customer_sites.display_all_games') }}">Games</a>
                                                 </li>
                                                 <li class="nav-item">
                                                         <a class="nav-link" href="#">Community</a>
@@ -61,7 +61,7 @@
                                         <div class="navbar-nav">
                                                 <a
                                                     {% if current_user.is_authenticated %}
-                                                        href="{{ url_for('edit_profile') }}"
+                                                        href="{{ url_for('customer_sites.edit_profile') }}"
                                                     {% else %}
                                                         href="#" onclick="show('block')"
                                                     {% endif %} class="nav-item nav-link user_photo">
@@ -89,13 +89,13 @@
                                                 </p>
                                         </div>
                                         <div class="navbar-nav">
-                                                <a {% if current_user.role_id == 1 %} href="{{ url_for('display_customers')}}" {% else %} href="{{ url_for('cart')}}" {% endif %} class="nav-item nav-link">
+                                                <a {% if current_user.role_id == 1 %} href="{{ url_for('admin.display_customers')}}" {% else %} href="{{ url_for('cart_and_order.cart')}}" {% endif %} class="nav-item nav-link">
                                                     <img alt="Cart" {% if current_user.role_id == 1 %} height="40" src="{{ url_for('static', filename='images/PinClipart.com_mason-jar-fireflies-clipart_2864909.png') }}" {% else %} height="20" src="{{ url_for('static', filename='images/pngaaa.com-3531796.png') }}" {% endif %} alt="Cart">
                                                     <span class="total-count">{{ cart_item_count }}</span>
                                                 </a>
                                         </div>
                                         <div class="navbar-nav">
-                                                <a href="{{ url_for('logout') }}" class="nav-item nav-link">
+                                                <a href="{{ url_for('auth.logout') }}" class="nav-item nav-link">
                                                     <img height="20" src="{{ url_for('static', filename='images/iconfinder_login_account_enter_door_3005767.png') }}" alt="Logout">
                                                 </a>
                                         </div>
@@ -161,7 +161,7 @@
 			            <div class="row">
 				                <nav class="navbar navbar-expand-sm navbar-dark">
 					                    <div class="logo-and-text">
-						                        <a href="{{ url_for('display_all_games') }}" class="navbar-brand">
+						                        <a href="{{ url_for('customer_sites.display_all_games') }}" class="navbar-brand">
 						        	                    <img src="{{ url_for('static', filename='images/ri2759.ico')}}" height="80" class="d-inline-block align-top" alt="Game-store-logo">
 						                        </a>
 						                        <p class="logo-text">Game store</p>
@@ -188,7 +188,7 @@
     $(document).ready(function(){
         $(".buy_button, .buy-button").click(function(){
             $.ajax({
-                url: '{{url_for('ajax_add_to_cart')}}',
+                url: '{{url_for('cart_and_order.ajax_add_to_cart')}}',
                 type: 'post',
                 dataType: 'json',
                 contentType: 'application/json',

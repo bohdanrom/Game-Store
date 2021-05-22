@@ -1,8 +1,7 @@
 from datetime import date, datetime
 
+from app import db, manager
 from flask_login import UserMixin
-
-from . import db, manager
 
 
 games_and_game_genres = db.Table(
@@ -98,8 +97,9 @@ class Comments(db.Model):
     text = db.Column(db.String(256))
     game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'))
     author_username = db.Column(db.String(64), db.ForeignKey('customers.customer_username'))
-    timestamp = db.Column(db.DateTime(), default=datetime.now().replace(microsecond=0), index=True)
+    timestamp = db.Column(db.DateTime(), default=datetime.utcnow().replace(microsecond=0), index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('comments.comment_id', ondelete='CASCADE'))
+    hidden = db.Column(db.DateTime(), default=None)
     replies = db.relationship('Comments', backref=db.backref('comments', remote_side=[comment_id]), lazy='dynamic',
                               passive_deletes=True)
     author = db.relationship("Customers", backref=db.backref('customers'), uselist=False)
@@ -136,3 +136,10 @@ class CartItem(db.Model):
     price = db.Column(db.Float)
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id'))
     game_item = db.relationship("Games", backref=db.backref('game_item'), uselist=False)
+
+
+@manager.user_loader
+def load_user(customer_id):
+    if customer_id is not None:
+        return Customers.query.get(customer_id)
+    return None

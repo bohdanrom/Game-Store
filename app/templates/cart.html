@@ -14,7 +14,7 @@
                     <p>$</p>
                 </div>
                 <div class="proceed_button">
-                    <a href="{{ url_for('order')}}" id="cartProceedButton" class="proceed">Proceed</a>
+                    <a href="{{ url_for('cart_and_order.order')}}" id="cartProceedButton" class="proceed">Proceed</a>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
                         {% for cart_item, cart_item_image, game_detail in cart_items|zip(cart_items_images, game_details) %}
                         <tr class="cart_element">
                             <td class="cart_game_image">
-                                <a href="{{ url_for('display_game', game_id=game_detail.game_id)}}">
+                                <a href="{{ url_for('customer_sites.display_game', game_id=game_detail.game_id)}}">
                                     <img src="data:image/jpeg;base64, {{ cart_item_image }}" alt="cart_item_image" class="cart_item_image">
                                 </a>
                             </td>
@@ -89,7 +89,7 @@
         }
         $('#amount'+gameId).text(currentValue);
         $.ajax({
-                url: action == 'minus' ? '{{url_for('ajax_delete_from_cart')}}' : '{{url_for('ajax_add_to_cart')}}',
+                url: action == 'minus' ? '{{url_for('cart_and_order.ajax_delete_from_cart')}}' : '{{url_for('cart_and_order.ajax_add_to_cart')}}',
                 type: 'post',
                 dataType: 'json',
                 contentType: 'application/json',
@@ -124,7 +124,7 @@
         $(".delete_game_from_cart_ico").click(function(){
             console.log($(this).attr('cart_item_id'));
             $.ajax({
-                url: '{{url_for('ajax_delete_cart_item')}}',
+                url: '{{url_for('cart_and_order.ajax_delete_cart_item')}}',
                 type: 'post',
                 dataType: 'json',
                 contentType: 'application/json',

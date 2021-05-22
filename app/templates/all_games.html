@@ -69,13 +69,13 @@
                                         {% if current_user.role_id == 1 %}
                                             <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='images/mark_edited2.png') }} {% endif %}" alt="game_img" class="game_ico" id="game_ico">
                                         {% else %}
-                                        <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
+                                        <a href="{{ url_for('customer_sites.display_game', game_id=data.game_id) }}" class="game_ref" id="game_ref">
                                             <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='images/mark_edited2.png') }} {% endif %}" alt="game_img" class="game_ico" id="game_ico">
                                         </a>
                                         {% endif %}
                                         {% if current_user.role_id == 1 %}
                                                 <div class="admin_overlay">
-                                                        <a href="{{ url_for('edit_game', game_id=data.game_id) }}" class="admin_img">
+                                                        <a href="{{ url_for('admin.edit_game', game_id=data.game_id) }}" class="admin_img">
                                                             <img src="{{ url_for('static', filename='images/white_pencil.png') }}" alt="" height="60" class="hover_img">
                                                         </a>
                                                         <a href="#" onclick="send({{ data.game_id }})" class="admin_img hide">
@@ -104,7 +104,7 @@
                                                                         </p>
                                                                 {% endfor %}
                                                         </div>
-                                                <a href="{{ url_for('display_game', game_id=data.game_id) }}" class="game_ref">
+                                                <a href="{{ url_for('customer_sites.display_game', game_id=data.game_id) }}" class="game_ref">
                                                         <h4 class="game-name" id="game-name">{{ data.game_name }}</h4>
                                                 </a>
                                         </div>
@@ -147,7 +147,7 @@
  <script>
     function send(id) {
         $.ajax({
-            url: '{{url_for('hide_game')}}',
+            url: '{{url_for('admin.hide_game')}}',
             type: 'post',
             dataType: 'json',
             contentType: 'application/json',

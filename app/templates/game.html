@@ -156,7 +156,7 @@
 <script>
         function deleteComment(commentId){
             $.ajax({
-                url: '{{ url_for('delete_comment') }}',
+                url: '{{ url_for('customer_sites.delete_comment') }}',
                 type: 'post',
                 dataType: 'json',
                 contentType: 'application/json',

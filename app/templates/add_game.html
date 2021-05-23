@@ -24,7 +24,16 @@
                                         <span class="anchor">Select Game Genres</span>
                                                 <ul class="items">
                                                         {% for genre in genres %}
-                                                                 <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{% if genre.game_type_name == '' %}{% if game %}Delete all genres from game {% else %} Add without genre {% endif %} {% else %} {{genre.game_type_name}} {% endif %}</li>
+                                                            {% if genre.game_genre_parent_id is none %}
+                                                                <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{% if genre.game_type_name == '' %}Games without genre {% else %} {{genre.game_type_name}} {% endif %}</li>
+                                                                    <div class="sub_genre" style="margin-left: 20px">
+                                                                        {% for sub_genre in genres %}
+                                                                            {% if sub_genre.game_genre_parent_id == genre.game_type_id %}
+                                                                                <li><input type="radio" name="new_game_genre" value="{{sub_genre.game_type_name}}">{{sub_genre.game_type_name}}</li>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </div>
+                                                            {% endif %}
                                                         {% endfor %}
                                                 </ul>
                                 </div>

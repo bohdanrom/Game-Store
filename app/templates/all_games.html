@@ -42,10 +42,39 @@
 <div class="row">
         <div class="filer_and_search">
                 <div id="filter" class="filter-dropdown-check-list" tabindex="100">
-                        <span class="anchor">Select Game Genres</span>
-                                <ul class="items">
+                        <span class="anchor genre_dropdown">+  Add genre</span>
+                                <ul class="genre_filter" id="genre_filter">
                                         {% for genre in genres %}
-                                                 <li><input type="checkbox" name="new_game_genre" value="{{genre.game_type_name}}">{% if genre.game_type_name == '' %}Games without genre {% else %} {{genre.game_type_name}} {% endif %}</li>
+                                            {% if genre.game_genre_parent_id is none %}
+                                                <li>
+                                                    <input type="checkbox" name="new_game_genre"
+                                                        {% for invalid_element in "~ ! @ $ ^ & * ( ) + = , . / ' ; : ? > < [ ] { } | ` # \\ ".split() if invalid_element in genre.game_type_name %}
+                                                                value="{{ genre.game_type_name[0] + '_' + genre.game_type_name[-1]}}"
+                                                            {% else %}
+                                                                value="{{ genre.game_type_name }}"
+                                                        {% endfor %}>
+                                                        {% if genre.game_type_name == '' %}
+                                                            Games without genre
+                                                        {% else %}
+                                                            {{genre.game_type_name}}
+                                                        {% endif %}
+                                                </li>
+                                                    <div class="sub_genre">
+                                                        {% for sub_genre in genres %}
+                                                            {% if sub_genre.game_genre_parent_id == genre.game_type_id %}
+                                                                <li>
+                                                                    <input type="checkbox" name="new_game_genre"
+                                                                           {% for invalid_element in "~ ! @ $ ^ & * ( ) + = , . / ' ; : ? > < [ ] { } | ` # \\ ".split() if invalid_element in sub_genre.game_type_name %}
+                                                                                value="{{ sub_genre.game_type_name[0] + '_' + sub_genre.game_type_name[-1]}}"
+                                                                           {% else %}
+                                                                                value="{{ sub_genre.game_type_name }}"
+                                                                           {% endfor %}>
+                                                                    {{sub_genre.game_type_name}}
+                                                                </li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                            {% endif %}
                                         {% endfor %}
                                 </ul>
                 </div>
@@ -64,7 +93,7 @@
 <div class="row">
         <div class="all_games" id="all_games">
                 {% for data, photo in all_games|zip(game_images) %}
-                        <div class="overlay">
+                        <div class="overlay" id="game{{ data.game_id }}">
                                 <div class="game_photo_div" game_id="{{ data.game_id }}">
                                         {% if current_user.role_id == 1 %}
                                             <img src="data:image/jpeg;base64, {% if photo %} {{ photo }} {% else %} {{ url_for('static', filename='images/mark_edited2.png') }} {% endif %}" alt="game_img" class="game_ico" id="game_ico">
@@ -95,9 +124,17 @@
                                                 <div class="game_genres_and_name" id="game_genres_and_name">
                                                         <div class="game_genres_for_one" id="game_genres_for_one">
                                                                 {% for genre in data.genres %}
-                                                                        <p class="game-genre" id="game-genre">
+                                                                        <p {% if genre.game_type_name|length > 1 %}
+                                                                                {% for invalid_element in "~ ! @ $ ^ & * ( ) + = , . / ' ; : ? > < [ ] { } | ` # \\ ".split() if invalid_element in genre.game_type_name %}
+                                                                                    class="game-genre {{ genre.game_type_name[0] + '_' + genre.game_type_name[-1]}}"
+                                                                                {% else %}
+                                                                                    class="game-genre {{ genre.game_type_name }}"
+                                                                                {% endfor %}
+                                                                            {% else %}
+                                                                                class="game-genre no_genre"
+                                                                            {% endif %} id="game-genre" game_id="{{ data.game_id }}">
                                                                                 {% if data.genres|length > 1 %}
-                                                                                        {{ genre.game_type_name }} / <!--ТРЕБА ПРИДУМАТИ ЯК ЗАБРАТИ СЛЕШ ВКІНЦІ-->
+                                                                                        {{ genre.game_type_name }} /
                                                                                 {% else %}
                                                                                         {{ genre.game_type_name }}
                                                                                 {% endif %}
@@ -114,6 +151,25 @@
                 {% endfor %}
         </div>
 </div>
+<script>
+    let sections = $('.game-genre');
+    function updateContentVisibility(){
+        let checked = $("#genre_filter :checkbox:checked");
+        if (checked.length){
+            $('.overlay').hide();
+            checked.each(function(){
+                let genreName = $(this).val() === '' ? 'no_genre' : $(this).val();
+                $('.' + genreName).map(function(){
+                    $('#game'+$(this).attr('game_id')).show()
+                });
+            });
+        } else {
+            $('.overlay').show();
+        }
+    }
+    $("#genre_filter :checkbox").click(updateContentVisibility);
+    updateContentVisibility();
+</script>
 <script>
     function myFunction() {
         let input, filter, allGames, game, listOfGames, i, txtValue;

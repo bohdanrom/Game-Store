@@ -25,7 +25,7 @@ class Games(db.Model):
     game_description = db.Column(db.Text, nullable=False)
     release_date = db.Column(db.Date, nullable=False, default=date.today())
     number_of_players = db.Column(db.Integer, default=0)
-    quantity_available = db.Column(db.Integer, default=2000)
+    quantity_available = db.Column(db.BigInteger, default=2000)
     price = db.Column(db.Numeric(5, 2))
     is_active = db.Column(db.Boolean, default=True)
     genres = db.relationship("GameGenres", secondary=games_and_game_genres,
@@ -52,7 +52,10 @@ class Platforms(db.Model):
 class GameGenres(db.Model):
     __tablename__ = 'game_genres'
     game_type_id = db.Column(db.Integer, primary_key=True)
+    game_genre_parent_id = db.Column(db.Integer, db.ForeignKey('game_genres.game_type_id', ondelete='CASCADE'))
     game_type_name = db.Column(db.String(50), nullable=False)
+    sub_genre = db.relationship('GameGenres', backref=db.backref('game_genres', remote_side=[game_type_id]),
+                                lazy='dynamic', passive_deletes=True)
 
 
 class Roles(db.Model):

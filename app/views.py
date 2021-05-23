@@ -9,6 +9,7 @@ from models import GameGenres, Customers, Cart, CartItem
 
 def return_genres():
     genres = GameGenres.query.all()
+    genres[0], genres[2] = genres[2], genres[0]
     return genres
 
 

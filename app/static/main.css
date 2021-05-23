@@ -538,7 +538,6 @@ header, footer{
     padding: 2px;
     display: none;
     margin: 0;
-    border: 1px solid #000000;
     border-top: none;
 }
 .dropdown-check-list ul.items li, .filter-dropdown-check-list ul.items li{
@@ -555,6 +554,8 @@ header, footer{
     display: block;
     text-align: start;
     width: 400px;
+    background: #ffffff;
+    padding: 0;
 }
 #modal{
     width: 350px;
@@ -1003,4 +1004,67 @@ tbody {
     border: none;
     outline: none;
     width: 100%;
+}
+.genre_dropdown{
+    margin-left: 10%;
+}
+.items, .genre_filter{
+    columns: 2;
+    -webkit-columns: 2;
+    -moz-columns: 2;
+}
+.dropdown-check-list .genre_dropdown, .filter-dropdown-check-list .genre_dropdown{
+    text-align: start;
+    color: #ffffff;
+    width: 150px;
+    font-size: 18px;
+    background: #1e1e1e;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    padding: 5px 50px 5px 2px;
+    border: none;
+    border-radius: 3px;
+}
+.dropdown-check-list ul.genre_filter, .filter-dropdown-check-list ul.genre_filter{
+    padding: 2px;
+    display: none;
+    margin: 0;
+    border: 1px solid #000000;
+    border-top: none;
+}
+.dropdown-check-list ul.genre_filter li, .filter-dropdown-check-list ul.genre_filter li{
+    color: #000000;
+    list-style: none;
+}
+.dropdown-check-list.visible .genre_filter, .filter-dropdown-check-list.visible .genre_filter {
+    position: absolute;
+    z-index: 99;
+    display: block;
+    text-align: start;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+    margin-left: 2.4%;
+    background: rgba(255,255,255,0.8);
+    padding: 0 0 0 3px;
+}
+.dropdown-check-list .genre_dropdown:after, .filter-dropdown-check-list .genre_dropdown:after{
+    position: absolute;
+    content: "";
+    border: none;
+    padding: 5px;
+    right: 10px;
+    top: 20%;
+    -moz-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    -o-transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    transform: rotate(-135deg);
+}
+.dropdown-check-list.visible .genre_dropdown, .filter-dropdown-check-list.visible .genre_dropdown {
+    color: #ffffff;
+}
+.sub_genre{
+    margin-left: 15px
 }

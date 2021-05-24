@@ -1,15 +1,31 @@
 import base64
+import datetime
+import atexit
 
 from flask_login import current_user
 from flask import redirect, session, g
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from app import db, app
-from models import GameGenres, Customers, Cart, CartItem
+from models import GameGenres, Customers, Cart, CartItem, Games
+
+
+def check_hidden_games():
+    for game in Games.query.all():
+        if game.hidden_timestamp is not None \
+                and (datetime.datetime.now()-game.hidden_timestamp) > datetime.timedelta(days=90):
+            db.session.delete(game)
+            db.session.commit()
+
+
+delete_hidden_games = BackgroundScheduler(daemon=True)
+delete_hidden_games.add_job(check_hidden_games, 'interval', minutes=60*24*7)
+delete_hidden_games.start()
+atexit.register(lambda: delete_hidden_games.shutdown())
 
 
 def return_genres():
     genres = GameGenres.query.all()
-    genres[0], genres[2] = genres[2], genres[0]
     return genres
 
 

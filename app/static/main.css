@@ -960,6 +960,7 @@ tbody {
     width: 100px;
 }
 .users{
+    margin: 100px 0 547px 4.5%;
     background-color: #1e1e1e;
     color: #ffffff;
 }
@@ -988,9 +989,6 @@ tbody {
 .customer_table_body .customer_table_row:hover .customer_cell, .customer_table_body .customer_table_row:hover .customer_header {
     background: rgb(22,156,63);
     color: #ffffff;
-}
-.users{
-    margin: 133px 0 134px 4.5%;
 }
 .customer_table_body{
     height: 645px;

@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from flask_login import login_required, current_user
@@ -93,8 +94,10 @@ def hide_game():
     game = Games.query.get(game_id)
     if game.is_active:
         game.is_active = False
+        game.hidden_timestamp = datetime.datetime.now()
     else:
         game.is_active = True
+        game.hidden_timestamp = None
     db.session.commit()
     return 'Ok'
 

@@ -6,15 +6,15 @@ from flask_login import UserMixin
 
 games_and_game_genres = db.Table(
     'games_and_game_genres',
-    db.Column('game_id', db.Integer, db.ForeignKey('games.game_id')),
-    db.Column('game_type_id', db.Integer, db.ForeignKey('game_genres.game_type_id'))
+    db.Column('game_id', db.Integer, db.ForeignKey('games.game_id', ondelete="CASCADE")),
+    db.Column('game_type_id', db.Integer, db.ForeignKey('game_genres.game_type_id', ondelete="CASCADE"))
 )
 
 
 games_and_platforms = db.Table(
     'games_and_platforms',
-    db.Column('game_id', db.Integer, db.ForeignKey('games.game_id')),
-    db.Column('platform_id', db.Integer, db.ForeignKey('platforms.platform_id'))
+    db.Column('game_id', db.Integer, db.ForeignKey('games.game_id', ondelete="CASCADE")),
+    db.Column('platform_id', db.Integer, db.ForeignKey('platforms.platform_id', ondelete="CASCADE"))
 )
 
 
@@ -28,6 +28,7 @@ class Games(db.Model):
     quantity_available = db.Column(db.BigInteger, default=2000)
     price = db.Column(db.Numeric(5, 2))
     is_active = db.Column(db.Boolean, default=True)
+    hidden_timestamp = db.Column(db.DateTime, default=None)
     genres = db.relationship("GameGenres", secondary=games_and_game_genres,
                              lazy='subquery', backref=db.backref('classes', lazy=True))
     platforms = db.relationship("Platforms", secondary=games_and_platforms,
@@ -98,8 +99,8 @@ class Comments(db.Model):
     __tablename__ = 'comments'
     comment_id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(256))
-    game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'))
-    author_username = db.Column(db.String(64), db.ForeignKey('customers.customer_username'))
+    game_id = db.Column(db.Integer, db.ForeignKey('games.game_id', ondelete="CASCADE"))
+    author_username = db.Column(db.String(64), db.ForeignKey('customers.customer_username', ondelete="CASCADE"))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow().replace(microsecond=0), index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('comments.comment_id', ondelete='CASCADE'))
     hidden = db.Column(db.DateTime(), default=None)
@@ -112,7 +113,7 @@ class Comments(db.Model):
 class Cart(db.Model):
     __tablename__ = 'cart'
     cart_id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('customers.customer_id'))
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.customer_id', ondelete="CASCADE"))
     cart_status = db.Column(db.Boolean, default=True)
     date = db.Column(db.DateTime(), default=datetime.now())
     customer = db.relationship("Customers", backref=db.backref('customer'), uselist=False)
@@ -121,7 +122,7 @@ class Cart(db.Model):
 class Orders(db.Model):
     __tablename__ = 'orders'
     order_id = db.Column(db.Integer, primary_key=True)
-    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id'), unique=True)
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id', ondelete="CASCADE"), unique=True)
     customer_first_name = db.Column(db.String(30))
     customer_last_name = db.Column(db.String(30))
     customer_email = db.Column(db.String(64), nullable=False)
@@ -134,10 +135,10 @@ class Orders(db.Model):
 class CartItem(db.Model):
     __tablename__ = 'cart_item'
     cart_item_id = db.Column(db.Integer, primary_key=True)
-    game_id = db.Column(db.Integer, db.ForeignKey("games.game_id"))
+    game_id = db.Column(db.Integer, db.ForeignKey("games.game_id", ondelete="CASCADE"))
     amount = db.Column(db.Integer, default=1)
     price = db.Column(db.Float)
-    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id'))
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id', ondelete="CASCADE"))
     game_item = db.relationship("Games", backref=db.backref('game_item'), uselist=False)
 
 

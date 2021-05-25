@@ -960,7 +960,8 @@ tbody {
     width: 100px;
 }
 .users{
-    margin: 100px 0 547px 4.5%;
+    width: 85%;
+    margin: 50px 0 50px 4.5%;
     background-color: #1e1e1e;
     color: #ffffff;
 }
@@ -1065,4 +1066,31 @@ tbody {
 }
 .sub_genre{
     margin-left: 15px
+}
+.edit_quantity{
+    background: #1e1e1e;
+    color: #ffffff;
+    outline: none;
+    border: none;
+    height: 100%;
+    width: 100%;
+}
+.customer_table_header, .customer_table_body{ display: block; }
+.customer_table_body {
+    height: 645px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.customer_table_header, .customer_table_body tr {
+    display: table;
+    width: 85%;
+    table-layout: fixed;
+}
+.customer_table_body tr{
+    width: 98%;
+}
+.customer_cell{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

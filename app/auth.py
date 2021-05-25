@@ -63,7 +63,7 @@ def signup():
                                                 customer_password=hash_password,
                                                 role=Roles.query.get(2))
                     add_to_db(new_user)
-                    login_user(new_user, remember=False)
+                    login_user(new_user)
                     return redirect(url_for('customer_sites.display_all_games', user_photo=g.photo, cart_item_count=g.cart))
     return redirect(url_for('customer_sites.display_all_games', user_photo=g.photo, cart_item_count=g.cart))
 

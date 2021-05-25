@@ -124,3 +124,13 @@ def display_customers():
         roles = Roles.query.all()
         return render_template('users_list.html', customers=customers, roles=roles, cart_item_count=g.cart, user_photo=g.photo)
     return redirect('/')
+
+
+@admin_sites.route('/edit_games_quantity')
+@login_required
+def edit_games_quantity():
+    g.photo = convert_image_from_binary_to_unicode(current_user.customer_photo)
+    if admin_permission() == 1:
+        games = Games.query.order_by(Games.game_id).all()
+        return render_template('games_list.html', games=games, cart_item_count=g.cart, user_photo=g.photo)
+    return redirect('/')

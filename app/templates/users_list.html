@@ -5,17 +5,17 @@
 {% block content %}
 <div class="row">
     <table class="users">
-        <thead class="customer_table_header">
-            <tr class="customer_table_row">
-                <th class="customer_header">№</th>
-                <th class="customer_header">Username</th>
-                <th class="customer_header">First Name</th>
-                <th class="customer_header">Last Name</th>
-                <th class="customer_header">Email</th>
-                <th class="customer_header">Role</th>
-                <th class="customer_header">Change Role</th>
-            </tr>
-        </thead>
+{#        <thead class="customer_table_header">#}
+{#            <tr class="customer_table_row">#}
+{#                <th class="customer_header">№</th>#}
+{#                <th class="customer_header">Username</th>#}
+{#                <th class="customer_header">First Name</th>#}
+{#                <th class="customer_header">Last Name</th>#}
+{#                <th class="customer_header">Email</th>#}
+{#                <th class="customer_header">Role</th>#}
+{#                <th class="customer_header">Change Role</th>#}
+{#            </tr>#}
+{#        </thead>#}
         <tbody class="customer_table_body">
             {% for user in customers %}
                 <tr class="customer_table_row">

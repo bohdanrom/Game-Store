@@ -1,0 +1,48 @@
+{% extends 'index.html' %}
+{% block title %}
+    Games List
+{% endblock %}
+{% block content %}
+<div class="row">
+    <table class="users edit_games">
+{#        <thead class="customer_table_header">#}
+{#            <tr class="customer_table_row">#}
+{#                <th class="customer_header">№</th>#}
+{#                <th class="customer_header">Game Name</th>#}
+{#                <th class="customer_header">Change Quantity</th>#}
+{#            </tr>#}
+{#        </thead>#}
+        <tbody class="customer_table_body">
+            {% for game in games %}
+                <tr class="customer_table_row">
+                   <td class="customer_cell">{{ loop.index }}</td>
+                   <td class="customer_cell">{{ game.game_name }}</td>
+                   <td class="customer_cell game-quantity">
+                       <input type="text" placeholder="Licenses Quantity" class="edit_quantity" value="{{ game.quantity_available }}">
+                   </td>
+                   <td class="customer_cell" style="background: #f56c16">
+                       <button class="add_role" id="{{ game.game_id }}">Edit quantity</button>
+                   </td>
+                </tr>
+                <tr class="empty_table_row"><td> </td></tr>
+            {% endfor %}
+      </tbody>
+   </table>
+</div>
+{#<script>#}
+{#    $('.add_role').on('click', function (){#}
+{#        customerId = $(this).attr('id');#}
+{#        roleId = $(this).val();#}
+{#        $.ajax({#}
+{#            url: '{{ url_for('admin.ajax_change_role') }}',#}
+{#            type: 'post',#}
+{#            dataType: 'json',#}
+{#            contentType: 'application/json',#}
+{#            data: JSON.stringify({customerId: customerId, roleId: roleId}),#}
+{#            success: function (roleName){#}
+{#                $('#user'+customerId).text(roleName);#}
+{#            },#}
+{#        });#}
+{#    });#}
+{#</script>#}
+{% endblock %}

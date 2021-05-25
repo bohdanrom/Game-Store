@@ -27,7 +27,7 @@ def delete_comment():
 @customer_sites.route('/<int:game_id>', methods=["GET", "POST"])
 def display_game(game_id: int):
     game_details = Games.query.filter_by(game_id=game_id).first()
-    if game_details.is_active:
+    if game_details is not None and game_details.is_active:
         if request.method == "POST":
             if current_user.is_authenticated:
                 comment = request.form.get('comment')

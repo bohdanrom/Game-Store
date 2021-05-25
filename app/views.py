@@ -7,13 +7,17 @@ from flask import redirect, session, g
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from app import db, app
-from models import GameGenres, Customers, Cart, CartItem, Games
+from models import GameGenres, Customers, Cart, CartItem, Games, GameImages, Comments
 
 
 def check_hidden_games():
     for game in Games.query.all():
         if game.hidden_timestamp is not None \
                 and (datetime.datetime.now()-game.hidden_timestamp) > datetime.timedelta(days=90):
+            for comment in Comments.query.filter_by(game_id=game.game_id).all():
+                db.session.delete(comment)
+            db.session.commit()
+            db.session.delete(GameImages.query.filter_by(game_id=game.game_id).first())
             db.session.delete(game)
             db.session.commit()
 
@@ -57,6 +61,12 @@ def redirect_to_login_page(response):
     if response.status_code == 401:
         return redirect('/' + '?showModal=' + 'true')
     return response
+
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = datetime.timedelta(minutes=5)
 
 
 @app.before_request

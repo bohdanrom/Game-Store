@@ -1153,7 +1153,7 @@ tbody {
     outline: none;
     transition: 0.2s all;
 }
-.edit-game:active{
+.edit-game:active, .add_game:active{
     transform: scale(0.98);
 }
 .hidden_comment{

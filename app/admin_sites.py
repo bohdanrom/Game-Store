@@ -8,8 +8,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Blueprint, redirect, request, flash, url_for, render_template, g
 
 from app import db
-from models import Customers, Games, GameImages, Roles, Comments
-from views import convert_image_from_binary_to_unicode, admin_permission, return_genres, add_to_db
+from .models import Customers, Games, GameImages, Roles, Comments
+from .common_functions import convert_image_from_binary_to_unicode, admin_permission, return_genres, add_to_db
 
 
 admin_sites = Blueprint("admin", __name__)

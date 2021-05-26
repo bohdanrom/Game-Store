@@ -2,10 +2,10 @@ import base64
 import datetime
 
 from flask_login import current_user
-from flask import redirect, session, g
+from flask import redirect, session, g, url_for
 
 from app import db, app
-from models import GameGenres, Customers, Cart, CartItem
+from .models import GameGenres, Customers, Cart, CartItem
 
 
 def return_genres():
@@ -46,7 +46,14 @@ def redirect_to_login_page(response):
 @app.before_request
 def make_session_permanent():
     session.permanent = True
-    app.permanent_session_lifetime = datetime.timedelta(minutes=5)
+    if 'remember' in session:
+        if isinstance(session['remember'], datetime.datetime):
+            if datetime.datetime.utcnow()-session['remember'].replace(tzinfo=None) > datetime.timedelta(days=7):
+                return redirect(url_for('auth.logout'))
+            elif datetime.datetime.utcnow()-session['remember'].replace(tzinfo=None) <= datetime.timedelta(minutes=0.2):
+                app.permanent_session_lifetime = datetime.timedelta(days=7)
+        else:
+            app.permanent_session_lifetime = datetime.timedelta(minutes=5)
 
 
 @app.before_request
@@ -69,7 +76,3 @@ def load_users():
         g.user = None
         g.photo = None
         g.cart = len(session['cart']) if 'cart' in session else 0
-
-
-if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True)

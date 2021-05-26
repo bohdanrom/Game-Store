@@ -1,11 +1,11 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from flask_login import login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import Blueprint, request, redirect, url_for, flash, session, g
 
-from views import add_to_db
-from models import Customers, Roles
+from .common_functions import add_to_db
+from .models import Customers, Roles
 
 
 auth = Blueprint("auth", __name__)
@@ -16,7 +16,7 @@ def login():
     if request.method == "POST":
         user_login = request.form.get('user_email')
         user_password = request.form.get('user_password')
-        remember_me = True if request.form.get('remember') else False
+        session['remember'] = datetime.utcnow() if request.form.get('remember') else None
         if user_login and user_password:
             user_credentials = Customers.query.filter_by(customer_email=user_login).first()
             if user_credentials and check_password_hash(user_credentials.customer_password, user_password):
@@ -74,4 +74,5 @@ def logout():
     logout_user()
     session.pop('cart', None)
     session.pop('cart_game_id', None)
+    session.pop('remember', None)
     return redirect(url_for('customer_sites.display_all_games', cart_item_count=g.cart))

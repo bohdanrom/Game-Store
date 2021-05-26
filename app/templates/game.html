@@ -23,17 +23,17 @@
         <div class="game_genres">
             {% for genre in game_details.genres %}
                 <div class="genre">
-                    <a href="#" class="genre_text">{% if genre.game_type_name == '' %} No genre {% else %} {{ genre.game_type_name }} {% endif %}</a>
+                    <p class="genre_text">{% if genre.game_type_name == '' %} No genre {% else %} {{ genre.game_type_name }} {% endif %}</p>
                 </div>
             {% endfor %}
         </div>
-        <div class="game_platforms">
-            {% for ico in platforms_ico %}
-                <a href="#" class="platform">
-                    <img src="data:image/jpeg;base64,{{ ico }}" height="60" alt="my_img" class="platform_ico">
-                </a>
-            {% endfor %}
-        </div>
+{#        <div class="game_platforms">#}
+{#            {% for ico in platforms_ico %}#}
+{#                <a href="#" class="platform">#}
+{#                    <img src="data:image/jpeg;base64,{{ ico }}" height="60" alt="my_img" class="platform_ico">#}
+{#                </a>#}
+{#            {% endfor %}#}
+{#        </div>#}
         <div class="game_description">
             <p class="game_description_text">{{game_details.game_description}}</p>
         </div>

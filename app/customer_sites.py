@@ -6,8 +6,8 @@ from flask_login import login_required, current_user
 from flask import Blueprint, request, redirect, g, render_template, session, url_for
 
 from app import db
-from models import Comments, Games, GameImages, Customers
-from views import admin_permission, add_to_db, convert_image_from_binary_to_unicode, return_genres
+from .models import Comments, Games, GameImages, Customers
+from .common_functions import admin_permission, add_to_db, convert_image_from_binary_to_unicode, return_genres
 
 
 customer_sites = Blueprint("customer_sites", __name__)
@@ -22,7 +22,7 @@ def delete_comment():
         if comment.hidden:
             comment.hidden = None
         else:
-            comment.hidden = datetime.utcnow()
+            comment.hidden = datetime.utcnow().replace(tzinfo=None)
         db.session.commit()
     return "Ok"
 
@@ -59,8 +59,8 @@ def display_game(game_id: int):
             comment_time_ago = []
             for comment_object in list_of_comments:
                 comment_time_ago.append(
-                    humanize.precisedelta(datetime.utcnow().replace(microsecond=0, second=0) -
-                                          comment_object.timestamp.replace(microsecond=0, second=0)))
+                    humanize.precisedelta(datetime.utcnow().replace(microsecond=0, second=0, tzinfo=None) -
+                                          comment_object.timestamp.replace(microsecond=0, second=0, tzinfo=None)))
             return comment_time_ago
         game_sub_comments2 = time_after_comment(game_sub_comments)
         game_comments2 = time_after_comment(game_comments)

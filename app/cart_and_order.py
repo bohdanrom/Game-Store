@@ -5,8 +5,8 @@ from flask_login import current_user
 from flask import Blueprint, session, request, flash, redirect, render_template, g
 
 from app import db, mail
-from models import Cart, Games, CartItem, Orders, GameImages
-from views import add_to_db, convert_image_from_binary_to_unicode, admin_permission
+from .models import Cart, Games, CartItem, Orders, GameImages
+from .common_functions import add_to_db, convert_image_from_binary_to_unicode, admin_permission
 
 
 cart_and_order = Blueprint('cart_and_order', __name__)
@@ -24,7 +24,7 @@ def is_cart_active():
 
 def send_mail(*args, **kwargs):
     msg = Message(f'Order for {args[1]} {args[2]} from game store', recipients=[args[0]])
-    with open('static/images/thank_u.png', 'rb') as photo_for_email:
+    with open('app/static/images/thank_u.png', 'rb') as photo_for_email:
         thank_you_image = photo_for_email.read()
     msg.html = render_template('email.html',
                            thank_you_image=convert_image_from_binary_to_unicode(thank_you_image),

@@ -1,11 +1,14 @@
-import datetime
 import json
+import atexit
+import datetime
+
 
 from flask_login import login_required, current_user
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Blueprint, redirect, request, flash, url_for, render_template, g
 
 from app import db
-from models import Customers, Games, GameImages, Roles
+from models import Customers, Games, GameImages, Roles, Comments
 from views import convert_image_from_binary_to_unicode, admin_permission, return_genres, add_to_db
 
 
@@ -134,3 +137,47 @@ def edit_games_quantity():
         games = Games.query.order_by(Games.game_id).all()
         return render_template('games_list.html', games=games, cart_item_count=g.cart, user_photo=g.photo)
     return redirect('/')
+
+
+@admin_sites.route('/ajax_edit_quantity', methods=["POST"])
+def ajax_edit_quantity():
+    game_id = request.json.get('gameId')
+    new_quantity = request.json.get('newQuantity')
+    if admin_permission() == 1:
+        try:
+            if int(new_quantity):
+                game = Games.query.get(game_id)
+                game.quantity_available = new_quantity
+                db.session.commit()
+                return str(game.quantity_available)
+        except ValueError:
+            return redirect(url_for('admin.edit_games_quantity'))
+
+
+def check_hidden_games():
+    for game in Games.query.all():
+        if game.hidden_timestamp is not None \
+                and (datetime.datetime.utcnow()-game.hidden_timestamp) > datetime.timedelta(days=90):
+            for comment in Comments.query.filter_by(game_id=game.game_id).all():
+                db.session.delete(comment)
+            db.session.commit()
+            db.session.delete(GameImages.query.filter_by(game_id=game.game_id).first())
+            db.session.delete(game)
+            db.session.commit()
+
+
+def check_hidden_comments():
+    for comment in Comments.query.all():
+        if comment.hidden is not None and ((datetime.datetime.utcnow()-comment.hidden) > datetime.timedelta(minutes=5)):
+            db.session.delete(comment)
+            db.session.commit()
+
+
+delete_hidden_games = BackgroundScheduler(daemon=True)
+delete_hidden_comments = BackgroundScheduler(daemon=True)
+delete_hidden_games.add_job(check_hidden_games, 'interval', minutes=60*24*7)
+delete_hidden_comments.add_job(check_hidden_comments, 'interval', minutes=1)
+delete_hidden_games.start()
+delete_hidden_comments.start()
+atexit.register(lambda: delete_hidden_games.shutdown())
+atexit.register(lambda: delete_hidden_comments.shutdown())

@@ -20,7 +20,7 @@ def login():
         if user_login and user_password:
             user_credentials = Customers.query.filter_by(customer_email=user_login).first()
             if user_credentials and check_password_hash(user_credentials.customer_password, user_password):
-                login_user(user_credentials, duration=timedelta(days=7) if remember_me else timedelta(minutes=1))
+                login_user(user_credentials, duration=timedelta(days=7))
                 return redirect(url_for('customer_sites.display_all_games', user_photo=g.photo))
             flash('Incorrect password')
             return redirect('/' + '?showModal=' + 'true')

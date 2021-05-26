@@ -129,34 +129,35 @@ def cart():
 def ajax_add_to_cart():
     if request.method == "POST":
         game = Games.query.get(int(request.json))
-        if not current_user.is_authenticated:
-            if request.json not in session['cart_game_id']:
-                session['cart'].append([float(game.price), 1, game.game_name])
-                session['cart_game_id'].append(request.json)
+        if game.is_active:
+            if not current_user.is_authenticated:
+                if request.json not in session['cart_game_id']:
+                    session['cart'].append([float(game.price), 1, game.game_name])
+                    session['cart_game_id'].append(request.json)
+                else:
+                    cart_id = session['cart_game_id'].index(request.json)
+                    session['cart'][cart_id][1] += 1
             else:
-                cart_id = session['cart_game_id'].index(request.json)
-                session['cart'][cart_id][1] += 1
-        else:
-            if current_user.role_id == 2:
-                if is_cart_active():
-                    user_cart = Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
-                        Cart.date.desc()).first()
-                    cart_items = CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
-                    cart_items_id = [item.game_id for item in cart_items]
-                    if request.json in cart_items_id:
-                        game_index = cart_items_id.index(request.json)
-                        cart_items[game_index].amount += 1
-                        cart_items[game_index].price = cart_items[game_index].amount * game.price
-                        db.session.commit()
-                    else:
-                        new_cart_item = CartItem(game_id=request.json, price=game.price, cart_id=user_cart.cart_id)
+                if current_user.role_id == 2:
+                    if is_cart_active():
+                        user_cart = Cart.query.filter_by(customer_id=current_user.customer_id).order_by(
+                            Cart.date.desc()).first()
+                        cart_items = CartItem.query.filter_by(cart_id=user_cart.cart_id).all()
+                        cart_items_id = [item.game_id for item in cart_items]
+                        if request.json in cart_items_id:
+                            game_index = cart_items_id.index(request.json)
+                            cart_items[game_index].amount += 1
+                            cart_items[game_index].price = cart_items[game_index].amount * game.price
+                            db.session.commit()
+                        else:
+                            new_cart_item = CartItem(game_id=request.json, price=game.price, cart_id=user_cart.cart_id)
+                            add_to_db(new_cart_item)
+                            cart_items.append(new_cart_item)
+                    elif not is_cart_active():
+                        user_cart = Cart(customer_id=current_user.customer_id)
+                        add_to_db(user_cart)
+                        new_cart_item = CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
                         add_to_db(new_cart_item)
-                        cart_items.append(new_cart_item)
-                elif not is_cart_active():
-                    user_cart = Cart(customer_id=current_user.customer_id)
-                    add_to_db(user_cart)
-                    new_cart_item = CartItem(game_id=int(request.json), price=game.price, cart_id=user_cart.cart_id)
-                    add_to_db(new_cart_item)
     return str(len(session['cart'])) if not current_user.is_authenticated \
         else str(len(CartItem.query.filter_by(cart_id=user_cart.cart_id).all()))
 

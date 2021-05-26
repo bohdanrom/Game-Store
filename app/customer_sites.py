@@ -19,7 +19,10 @@ def delete_comment():
     comment_id = request.json
     comment = Comments.query.get(int(comment_id))
     if comment.author_username == current_user.customer_username or admin_permission() == 1:
-        db.session.delete(comment)
+        if comment.hidden:
+            comment.hidden = None
+        else:
+            comment.hidden = datetime.utcnow()
         db.session.commit()
     return "Ok"
 

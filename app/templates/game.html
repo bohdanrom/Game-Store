@@ -52,14 +52,26 @@
                                 </div>
                             </div>
                             <div class="comment_div">
-                                <p class="comment_text" id="{{ comment.comment_id }}" >{{ comment.text }}</p>
+                            {% if comment.hidden %}
+                                <p class="comment_text hidden_comment" id="{{ comment.comment_id }}">the comment was deleted by author</p>
+                            {% else %}
+                                <p class="comment_text" id="{{ comment.comment_id }}">{{ comment.text }}</p>
+                            {% endif %}
                                 {% if not comment.parent_id %}
                                     {% if current_user.is_authenticated %}
                                         <div class="crud_comments">
-                                            <p onclick="parentReply(commentId={{ comment.comment_id }}, commentAuthor=`{{ comment.author_username }}`, commentText=`{{ comment.text }}`)" class="reply">Reply</p>
+                                            {% if comment.hidden is none %}
+                                                <p onclick="parentReply(commentId={{ comment.comment_id }}, commentAuthor=`{{ comment.author_username }}`, commentText=`{{ comment.text }}`)" class="reply">Reply</p>
+                                            {% endif %}
                                             {% if ((current_user.customer_username == comment.author_username) or (current_user.role_id == 1)) %}
-                                                <p class="reply edit_comment" onclick="editComment(commentText=`{{ comment.text }}`, commentId={{ comment.comment_id }})">Edit</p>
-                                                <p class="reply delete_comment" onclick="deleteComment(commentId={{ comment.comment_id }})">Delete</p>
+                                                {% if comment.hidden is none %}
+                                                    <p class="reply edit_comment" onclick="editComment(commentText=`{{ comment.text }}`, commentId={{ comment.comment_id }})">Edit</p>
+                                                {% endif %}
+                                                {% if comment.hidden %}
+                                                    <p class="reply delete_comment" onclick="deleteComment(commentId={{ comment.comment_id }})">Restore</p>
+                                                {% else %}
+                                                    <p class="reply delete_comment" onclick="deleteComment(commentId={{ comment.comment_id }})">Delete</p>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     {% endif %}
@@ -76,12 +88,22 @@
                                                     </div>
                                                 </div>
                                                 <div class="sub comment_div">
-                                                    <p class="comment_text" id="{{ sub_comment.comment_id }}">{{ sub_comment.text }}</p>
+                                                    {% if sub_comment.hidden %}
+                                                        <p class="comment_text hidden_comment" id="{{ sub_comment.comment_id }}">the comment was deleted by author</p>
+                                                    {% else %}
+                                                        <p class="comment_text" id="{{ sub_comment.comment_id }}">{{ sub_comment.text }}</p>
+                                                    {% endif %}
                                                     {% if ((current_user.customer_username == sub_comment.author_username) or (current_user.role_id == 1)) %}
-                                                    <div class="crud_comments">
-                                                        <p onclick="editComment(commentText=`{{ sub_comment.text }}`, commentId={{ sub_comment.comment_id }})" class="reply edit_comment">Edit</p>
-                                                        <p onclick="deleteComment(commentId={{ sub_comment.comment_id }})" class="reply delete_comment">Delete</p>
-                                                    </div>
+                                                        <div class="crud_comments">
+                                                            {% if sub_comment.hidden is none %}
+                                                                <p onclick="editComment(commentText=`{{ sub_comment.text }}`, commentId={{ sub_comment.comment_id }})" class="reply edit_comment">Edit</p>
+                                                            {% endif %}
+                                                            {% if sub_comment.hidden %}
+                                                                <p onclick="deleteComment(commentId={{ sub_comment.comment_id }})" class="reply delete_comment">Restore</p>
+                                                            {% else %}
+                                                                <p onclick="deleteComment(commentId={{ sub_comment.comment_id }})" class="reply delete_comment">Delete</p>
+                                                            {% endif %}
+                                                        </div>
                                                     {% endif %}
                                                 </div>
                                             </div>
@@ -166,5 +188,18 @@
                 window.location.reload();
             });
         }
+</script>
+<script>
+    $(document).ready(function (){
+       if (window.performance) {
+           console.info("window.performance works fine on this browser");
+       }
+       console.info(performance.navigation.type);
+       if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+           console.info( "This page is reloaded" );
+       } else {
+           console.info( "This page is not reloaded");
+       }
+    });
 </script>
 {% endblock %}

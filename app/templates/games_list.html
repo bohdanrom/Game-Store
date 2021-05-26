@@ -4,6 +4,7 @@
 {% endblock %}
 {% block content %}
 <div class="row">
+    <a href="{{ url_for('admin.display_customers') }}" class="edit-game">Edit user roles</a>
     <table class="users edit_games">
 {#        <thead class="customer_table_header">#}
 {#            <tr class="customer_table_row">#}
@@ -18,10 +19,10 @@
                    <td class="customer_cell">{{ loop.index }}</td>
                    <td class="customer_cell">{{ game.game_name }}</td>
                    <td class="customer_cell game-quantity">
-                       <input type="text" placeholder="Licenses Quantity" class="edit_quantity" value="{{ game.quantity_available }}">
+                       <input type="text" placeholder="Licenses Quantity" id="edit_quantity{{ game.game_id }}" class="edit_quantity" value="{{ game.quantity_available }}">
                    </td>
                    <td class="customer_cell" style="background: #f56c16">
-                       <button class="add_role" id="{{ game.game_id }}">Edit quantity</button>
+                       <button onclick="editQuantity({{ game.game_id }})" type="button" class="add_role game_edit" id="{{ game.game_id }}">Edit quantity</button>
                    </td>
                 </tr>
                 <tr class="empty_table_row"><td> </td></tr>
@@ -29,20 +30,20 @@
       </tbody>
    </table>
 </div>
-{#<script>#}
-{#    $('.add_role').on('click', function (){#}
-{#        customerId = $(this).attr('id');#}
-{#        roleId = $(this).val();#}
-{#        $.ajax({#}
-{#            url: '{{ url_for('admin.ajax_change_role') }}',#}
-{#            type: 'post',#}
-{#            dataType: 'json',#}
-{#            contentType: 'application/json',#}
-{#            data: JSON.stringify({customerId: customerId, roleId: roleId}),#}
-{#            success: function (roleName){#}
-{#                $('#user'+customerId).text(roleName);#}
-{#            },#}
-{#        });#}
-{#    });#}
-{#</script>#}
+<script>
+    function editQuantity(gameId){
+        newQuantity = $('#edit_quantity'+gameId).val();
+        $.ajax({
+            url: '{{ url_for('admin.ajax_edit_quantity') }}',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({gameId: gameId, newQuantity: newQuantity}),
+            success: function (quantity) {
+                console.log(quantity)
+                $('#edit_quantity' + gameId).val(quantity);
+            },
+        });
+    }
+</script>
 {% endblock %}

@@ -23,7 +23,7 @@ a, a:hover, a:active{
     outline: none;
     color: #ffffff;
 }
-a, button, input{
+a, button{
     transition: all 0.5s ease;
 }
 input, input:hover, input:focus, input:active,
@@ -122,6 +122,10 @@ header, footer{
     display: inline-block;
     font-size: 25px;
     font-weight: bold;
+    text-decoration: none;
+    box-shadow: 7px 6px 28px 1px rgba(0, 0, 0, 0.24);
+    outline: none;
+    transition: 0.2s all;
 }
 .genre_text{
     background: #5097f3;
@@ -248,6 +252,9 @@ header, footer{
     display: inline-block;
     font-size: 15px;
     font-weight: bold;
+    box-shadow: 7px 6px 28px 1px rgba(0, 0, 0, 0.24);
+    outline: none;
+    transition: 0.2s all;
 }
 .game_ico{
     height: 200px;
@@ -987,7 +994,7 @@ tbody {
     background-color: #1e1e1e;
     border: 2px solid #20c579;
 }
-.customer_table_body .customer_table_row:hover .customer_cell, .customer_table_body .customer_table_row:hover .customer_header {
+.customer_table_body .customer_table_row:hover .customer_cell, .customer_table_body .customer_table_row:hover .customer_header, .edit_quantity:hover {
     background: rgb(22,156,63);
     color: #ffffff;
 }
@@ -1093,4 +1100,63 @@ tbody {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.customer_cell:nth-child(1){
+    width: 10%;
+}
+.customer_cell:nth-child(3){
+    width: 25%;
+}
+.customer_cell:nth-child(4){
+    width: 25%;
+}
+.close_alert{
+    background: inherit;
+    border: none;
+    color: #721c24;
+    margin-right: 20px;
+}
+.customer_table_header{
+    width: 100%;
+}
+.customer_table_header td{
+    text-align: right;
+}
+.customer_table_header td:nth-child(1){
+    text-align: left;
+}
+.buy-button:active, .buy_button:active{
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+.game_edit{
+    transition: 0.2s all;
+}
+.game_edit:active{
+    transform: scale(0.98);
+    color: #ffffff;
+}
+.edit-game{
+    color: rgba(255,255,255,0.85);
+    background: #169c3f;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    margin-left: 4.6%;
+    width: 150px;
+    height: 30px;
+    text-align: center;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: bold;
+    box-shadow: 7px 6px 28px 1px rgba(0, 0, 0, 0.24);
+    outline: none;
+    transition: 0.2s all;
+}
+.edit-game:active{
+    transform: scale(0.98);
+}
+.hidden_comment{
+    color: #485F6E;
+    font-size: 13px;
 }

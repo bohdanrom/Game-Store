@@ -71,8 +71,8 @@ def signup():
 @auth.route('/logout', methods=["POST", "GET"])
 @login_required
 def logout():
+    session.pop('remember', None)
     logout_user()
     session.pop('cart', None)
     session.pop('cart_game_id', None)
-    session.pop('remember', None)
     return redirect(url_for('customer_sites.display_all_games', cart_item_count=g.cart))

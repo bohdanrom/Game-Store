@@ -177,6 +177,7 @@ header, footer{
     grid-template-columns: repeat(auto-fill, minmax(33.33%, 1fr));
     margin-left: 4%;
     margin-right: 10%;
+    margin-bottom: 0.05%;
     width: 90%;
     height: 645px;
     overflow-y:auto;
@@ -282,7 +283,7 @@ header, footer{
 .filer_and_search{
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
+    margin-top: 1%;
     width: 90%;
 }
 .search_game{
@@ -968,7 +969,7 @@ tbody {
 }
 .users{
     width: 85%;
-    margin: 50px 0 50px 4.5%;
+    margin: 32px 0 38px 4.5%;
     background-color: #1e1e1e;
     color: #ffffff;
 }
@@ -999,7 +1000,7 @@ tbody {
     color: #ffffff;
 }
 .customer_table_body{
-    height: 645px;
+    height: 640px;
     overflow-y:auto;
 }
 .empty_table_row>td{

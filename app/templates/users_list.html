@@ -35,7 +35,7 @@
                    <td class="customer_cell" style="background: #f56c16">
                        <select name="give_role" id="{{ user.customer_id }}" class="add_role">
                            {% for role in roles %}
-                               <option value="{{ role.role_id }}">{{ role.name }}</option>
+                               <option value="{{ role.role_id }}" {% if user.role_id == role.role_id %} selected {% endif %}>{{ role.name }}</option>
                            {% endfor %}
                        </select>
                    </td>

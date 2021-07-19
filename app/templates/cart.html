@@ -75,7 +75,7 @@
         let currentValue = Number($('#amount'+gameId).text());
         let currentPrice = Number($('#price'+gameId).text());
         let standartPrice = Number($('#standart_price'+gameId).text());
-        if ( action == 'minus'){
+        if ( action === 'minus'){
             if ( currentValue > 1 ){
                 currentValue -= 1;
                 $('#price'+gameId).text(Math.ceil((currentPrice-standartPrice)*100)/100);
@@ -89,7 +89,7 @@
         }
         $('#amount'+gameId).text(currentValue);
         $.ajax({
-                url: action == 'minus' ? '{{url_for('cart_and_order.ajax_delete_from_cart')}}' : '{{url_for('cart_and_order.ajax_add_to_cart')}}',
+                url: action === 'minus' ? '{{url_for('cart_and_order.ajax_delete_from_cart')}}' : '{{url_for('cart_and_order.ajax_add_to_cart')}}',
                 type: 'post',
                 dataType: 'json',
                 contentType: 'application/json',

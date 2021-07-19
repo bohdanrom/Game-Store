@@ -22,7 +22,7 @@ def delete_comment():
         if comment.hidden:
             comment.hidden = None
         else:
-            comment.hidden = datetime.utcnow().replace(tzinfo=None)
+                comment.hidden = datetime.utcnow().replace(tzinfo=None)
         db.session.commit()
     return "Ok"
 

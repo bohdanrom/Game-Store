@@ -17,7 +17,8 @@ def is_cart_active():
     try:
         if user_cart.cart_status:
             return True
-        return False
+        elif not user_cart.cart_status:
+            return False
     except AttributeError:
         return False
 

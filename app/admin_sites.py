@@ -43,7 +43,7 @@ def add_new_game():
                 new_game.genres.append(genre)
         add_to_db(new_game)
         if not game_image:
-            with open('static/images/mark_edited2.png', 'rb') as default_photo:
+            with open('app/static/images/mark_edited2.png', 'rb') as default_photo:
                 game_image = default_photo.read()
         new_game_image = GameImages(game_id=new_game.game_id, game_photo=game_image)
         add_to_db(new_game_image)

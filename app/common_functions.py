@@ -1,8 +1,8 @@
 import base64
 import datetime
 
-from flask_login import current_user
-from flask import redirect, session, g, url_for
+from flask_login import current_user, logout_user
+from flask import redirect, session, g
 
 from app import db, app
 from .models import GameGenres, Customers, Cart, CartItem
@@ -49,7 +49,10 @@ def make_session_permanent():
     if 'remember' in session:
         if isinstance(session['remember'], datetime.datetime):
             if datetime.datetime.utcnow()-session['remember'].replace(tzinfo=None) > datetime.timedelta(days=7):
-                return redirect(url_for('auth.logout'))
+                session.pop('remember', None)
+                logout_user()
+                session.pop('cart', None)
+                session.pop('cart_game_id', None)
             elif datetime.datetime.utcnow()-session['remember'].replace(tzinfo=None) <= datetime.timedelta(minutes=0.2):
                 app.permanent_session_lifetime = datetime.timedelta(days=7)
         else:

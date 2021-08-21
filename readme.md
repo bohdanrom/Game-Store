@@ -91,7 +91,7 @@ You can't make an order without any game in a cart.
 
 If you make everything right we will send check to your email.
 
-<h3>__FOR ADMINS__</h3>
+<h3>FOR ADMINS</h3>
 
 *Admin hover with edit and hide buttons*
 
